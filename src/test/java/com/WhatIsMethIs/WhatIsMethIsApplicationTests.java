@@ -1,4 +1,4 @@
-package com.ossp2023.WhatIsMethIs;
+package com.WhatIsMethIs;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
