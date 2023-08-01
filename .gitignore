@@ -43,3 +43,5 @@ out/
 /gradlew.bat
 /settings.gradle
 /src/main/resources/whatismethis_server.pem
+/src/main/java/com/WhatIsMethIs/config/Secret.java
+/application.properties
