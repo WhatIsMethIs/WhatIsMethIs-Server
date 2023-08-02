@@ -1,8 +1,9 @@
-package com.WhatIsMethIs.service;
+package com.WhatIsMethIs.src.service;
 
 import com.WhatIsMethIs.config.BaseException;
-import com.WhatIsMethIs.entity.User;
-import com.WhatIsMethIs.repository.UserRepository;
+import com.WhatIsMethIs.src.entity.User;
+import com.WhatIsMethIs.src.repository.UserRepository;
+import com.WhatIsMethIs.utils.TokenUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,10 +37,10 @@ import static com.WhatIsMethIs.config.BaseResponseStatus.*;
 @Service
 public class SocialLoginService {
 
-    private final TokenService tokenService;
+    private final TokenUtils tokenUtils;
     @Autowired
-    public SocialLoginService(TokenService tokenService) {
-        this.tokenService = tokenService;
+    public SocialLoginService(TokenUtils tokenUtils) {
+        this.tokenUtils = tokenUtils;
     }
 
     @Autowired

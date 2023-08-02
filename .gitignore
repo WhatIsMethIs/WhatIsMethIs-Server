@@ -35,5 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
-/src/main/java/com/WhatIsMethIs/config/Secret.java
 /application.properties
+/src/main/java/com/WhatIsMethIs/config/secret/Secret.java

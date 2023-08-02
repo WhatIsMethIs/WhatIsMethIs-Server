@@ -15,7 +15,7 @@ public class ValidationRegex {
 
     // 날짜 형식 체크
     public static boolean isRegexPhoneNumber(String phoneNumber) {
-        String regex = "^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$";
+        String regex = "^\\d{3}-\\d{3,4}-\\d{4}$";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(phoneNumber);
         return matcher.find();

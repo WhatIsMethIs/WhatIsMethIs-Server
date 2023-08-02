@@ -1,6 +1,5 @@
-package com.WhatIsMethIs.dto.user;
+package com.WhatIsMethIs.src.dto.user;
 
-import com.WhatIsMethIs.entity.User;
 import lombok.*;
 
 @Getter
