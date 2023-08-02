@@ -1,4 +1,4 @@
-package com.WhatIsMethIs.dto.user;
+package com.WhatIsMethIs.src.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

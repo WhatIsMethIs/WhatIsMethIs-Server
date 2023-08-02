@@ -1,6 +1,6 @@
-package com.WhatIsMethIs.dto.user;
+package com.WhatIsMethIs.src.dto.user;
 
-import com.WhatIsMethIs.entity.User;
+import com.WhatIsMethIs.src.entity.User;
 import lombok.*;
 
 @Getter
@@ -31,5 +31,4 @@ public class UserReq {
                 .phoneNumber(phoneNumber)
                 .build();
     }
-
 }

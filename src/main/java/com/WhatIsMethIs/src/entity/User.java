@@ -1,14 +1,11 @@
-package com.WhatIsMethIs.entity;
+package com.WhatIsMethIs.src.entity;
 
-import com.WhatIsMethIs.dto.user.ModifyEmergencyReq;
-import com.WhatIsMethIs.dto.user.ModifyReq;
-import com.WhatIsMethIs.dto.user.UserReq;
+import com.WhatIsMethIs.src.dto.user.ModifyEmergencyReq;
+import com.WhatIsMethIs.src.dto.user.ModifyReq;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @Entity
@@ -22,21 +19,18 @@ public class User {
     public String email;
     @Column(length = 200)
     public String password;
-    @Column(length = 6, nullable = false)
+    @Column(length = 10, nullable = false)
     public String name;
     @Column(length = 4, nullable = false)
     public String age;
-    @Column(length = 20, nullable = false)
+    @Column(length = 20, nullable = false, name="phone_number")
     public String phoneNumber;
-    @Column(length = 20)
+    @Column(length = 20, name = "emergency_contact1")
     public String emergencyContact1;
-    @Column(length = 20)
+    @Column(length = 20, name = "emergency_contact2")
     public String emergencyContact2;
-    @Column(length = 20)
+    @Column(length = 20, name = "emergency_contact3")
     public String emergencyContact3;
-
-//    public String refreshToken;
-//    public String deviceToken;
 
     @Builder
     public User(int id, String email, String password, String name, String age, String phoneNumber, String emergencyContact1, String emergencyContact2, String emergencyContact3) {

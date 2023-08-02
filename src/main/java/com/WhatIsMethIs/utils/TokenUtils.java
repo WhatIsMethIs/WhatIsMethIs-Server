@@ -1,7 +1,7 @@
-package com.WhatIsMethIs.service;
+package com.WhatIsMethIs.utils;
 
 import com.WhatIsMethIs.config.BaseException;
-import com.WhatIsMethIs.config.Secret;
+import com.WhatIsMethIs.config.secret.Secret;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +16,7 @@ import java.util.Date;
 import static com.WhatIsMethIs.config.BaseResponseStatus.*;
 
 @Service
-public class TokenService {
+public class TokenUtils {
 
     public String createJwt(int userId){
         Date now = new Date();

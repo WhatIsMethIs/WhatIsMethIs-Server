@@ -1,14 +1,17 @@
-package com.WhatIsMethIs.service;
+package com.WhatIsMethIs.src.service;
 
-import com.WhatIsMethIs.config.Secret;
-import com.WhatIsMethIs.entity.User;
+import com.WhatIsMethIs.config.secret.Secret;
+import com.WhatIsMethIs.src.dto.user.*;
+import com.WhatIsMethIs.src.entity.User;
 import com.WhatIsMethIs.config.BaseException;
-import com.WhatIsMethIs.dto.user.*;
-import com.WhatIsMethIs.repository.UserRepository;
+import com.WhatIsMethIs.src.repository.UserRepository;
 import com.WhatIsMethIs.utils.AES128;
+import com.WhatIsMethIs.utils.TokenUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.beans.Transient;
 import java.util.List;
 
 import static com.WhatIsMethIs.config.BaseResponseStatus.*;
@@ -16,18 +19,17 @@ import static com.WhatIsMethIs.utils.ValidationRegex.*;
 
 @Service
 public class UserService {
-    private final TokenService tokenService;
+    private final TokenUtils tokenUtils;
     private final SocialLoginService socialLoginService;
-
-    @Autowired
-    public UserService(TokenService tokenService, SocialLoginService socialLoginService) {
-        this.tokenService = tokenService;
-        this.socialLoginService = socialLoginService;
-    }
-
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    public UserService(TokenUtils tokenUtils, SocialLoginService socialLoginService) {
+        this.tokenUtils = tokenUtils;
+        this.socialLoginService = socialLoginService;
+//        this.userRepository = userRepository;
+    }
     // User 전체 조회
     public List<User> getUsers() throws BaseException {
         try {
@@ -43,6 +45,7 @@ public class UserService {
     public User getUser(int index) throws BaseException{
         User user = userRepository.findById(index).orElse(null);
         try {
+            if(user == null) throw new BaseException(USER_NOT_EXIST);
             return user;
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -70,7 +73,7 @@ public class UserService {
                 try {
                     User user = userReq.toEntity();
                     userRepository.save(user);
-                    return new UserRes(user.getId(), user.getEmail(), tokenService.createJwt(user.getId()));
+                    return new UserRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()));
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     throw new BaseException(DATABASE_ERROR);
@@ -99,7 +102,7 @@ public class UserService {
                 throw new BaseException(PASSWORD_DECRYPTION_ERROR);
             }
             if (loginReq.getPassword().equals(password)) {
-                return new UserRes(user.getId(), user.getEmail(), tokenService.createJwt(user.getId()));
+                return new UserRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()));
             }
             else {
                 throw new BaseException(FAIL_TO_LOGIN);
@@ -113,7 +116,7 @@ public class UserService {
     public UserRes kakaoLogin(String accessToken) throws BaseException {
         User user = socialLoginService.getKakaoUserByAccessToken(accessToken);
         if (user != null) {
-            return new UserRes(user.getId(), user.getEmail(), tokenService.createJwt(user.getId()));
+            return new UserRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()));
         } else {
             return new UserRes(-1, "", "");
         }
@@ -123,23 +126,24 @@ public class UserService {
     public UserRes appleLogin(String accessToken) throws BaseException {
         User user = socialLoginService.getAppleUserByAccessToken(accessToken);
         if (user != null) {
-            return new UserRes(user.getId(), user.getEmail(), tokenService.createJwt(user.getId()));
+            return new UserRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()));
         } else {
             return new UserRes(-1, "", "");
         }
     }
 
-    // User 수정
+    // User 수정 // 수정하기
+    @Transactional
     public ModifyRes modifyUser(int index, ModifyReq modifyReq) throws BaseException {
         if(!isRegexEmail(modifyReq.getEmail())){
             throw new BaseException(POST_USERS_INVALID_EMAIL);
         }else if(!isRegexPhoneNumber(modifyReq.getPhoneNumber())){
             throw new BaseException(POST_USERS_INVALID_PHONENUMBER);
-        }else {
+        } else {
             try {
-                User user = userRepository.findById(index).orElse(null);
-                if (user != null && user.getId() == index){
 
+                User user = userRepository.findById(index).orElse(null);
+                if (user != null && user.getId() == index) {
                     user.modify(modifyReq);
                     return new ModifyRes(user.getId());
                 } else {
@@ -154,6 +158,7 @@ public class UserService {
 
 
     // 비상연락망 등록 및 수정
+    @Transactional
     public ModifyRes modifyEmergencyContact(int index, ModifyEmergencyReq modifyReq) throws BaseException {
         if(!isRegexPhoneNumber(modifyReq.getContact1()) || !isRegexPhoneNumber(modifyReq.getContact2()) || !isRegexPhoneNumber(modifyReq.getContact3())){
             throw new BaseException(POST_USERS_INVALID_PHONENUMBER);
@@ -174,6 +179,7 @@ public class UserService {
     }
 
     // User 삭제
+    @Transactional
     public void deleteUser(int userId) throws BaseException {
         userRepository.deleteById(userId);
     }

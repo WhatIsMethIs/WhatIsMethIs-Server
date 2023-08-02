@@ -1,4 +1,4 @@
-package com.WhatIsMethIs.dto.user;
+package com.WhatIsMethIs.src.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class LoginReq {
-    private String email;
-    private String password;
+public class ModifyRes {
+    private int id;
 }

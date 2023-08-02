@@ -1,12 +1,12 @@
-package com.WhatIsMethIs.controller;
+package com.WhatIsMethIs.src.controller;
 
 import com.WhatIsMethIs.config.BaseException;
 import com.WhatIsMethIs.config.BaseResponse;
-import com.WhatIsMethIs.dto.user.*;
-import com.WhatIsMethIs.entity.User;
-import com.WhatIsMethIs.service.SocialLoginService;
-import com.WhatIsMethIs.service.UserService;
-import com.WhatIsMethIs.service.TokenService;
+import com.WhatIsMethIs.src.dto.user.*;
+import com.WhatIsMethIs.src.entity.User;
+import com.WhatIsMethIs.src.service.SocialLoginService;
+import com.WhatIsMethIs.src.service.UserService;
+import com.WhatIsMethIs.utils.TokenUtils;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,13 +27,13 @@ public class UserController {
     @Autowired
     private final SocialLoginService socialLoginService;
     @Autowired
-    private final TokenService tokenService;
+    private final TokenUtils tokenUtils;
 
 
-    public UserController(UserService userService, SocialLoginService socialLoginService, TokenService tokenService) {
+    public UserController(UserService userService, SocialLoginService socialLoginService, TokenUtils tokenUtils) {
         this.userService = userService;
         this.socialLoginService = socialLoginService;
-        this.tokenService = tokenService;
+        this.tokenUtils = tokenUtils;
     }
 
 
@@ -93,10 +93,10 @@ public class UserController {
     })
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<UserRes> createUser(@Parameter @RequestBody UserReq postUserReq) {
+    public BaseResponse<UserRes> createUser(@Parameter @RequestBody UserReq userReq) {
         try {
-            UserRes postUserRes = userService.createUser(postUserReq);
-            return new BaseResponse<>(postUserRes);
+            UserRes userRes = userService.createUser(userReq);
+            return new BaseResponse<>(userRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -118,7 +118,7 @@ public class UserController {
     })
     @ResponseBody
     @PostMapping("/login")
-    public BaseResponse<UserRes> login(@Parameter(required = true) @RequestParam String loginCode, @Parameter @RequestBody(required = false) LoginReq loginReq) {
+    public BaseResponse<UserRes> login(@Parameter(required = true, name="loginCode") @RequestParam String loginCode, @Parameter @RequestBody(required = false) LoginReq loginReq) {
         try {
             UserRes userRes;
             if (loginCode == null) {
@@ -128,11 +128,11 @@ public class UserController {
                 userRes = userService.emailLogin(loginReq);
             } else if(loginCode.equals("kakao")) {
                 // 카카오 로그인
-                String accessToken = tokenService.getAccessToken();
+                String accessToken = tokenUtils.getAccessToken();
                 userRes = userService.kakaoLogin(accessToken);
             } else if(loginCode.equals("apple")) {
                 // 애플 로그인
-                String accessToken = tokenService.getAccessToken();
+                String accessToken = tokenUtils.getAccessToken();
                 userRes = userService.appleLogin(accessToken);
             } else {
                 throw new BaseException(INVALID_REQ_PARAM);
@@ -164,7 +164,7 @@ public class UserController {
     @PatchMapping("")
     public BaseResponse<ModifyRes> modifyUser(@Parameter(required = true) @RequestBody ModifyReq modifyReq) {
         try {
-            int userIdByJwt = tokenService.getUserId();
+            int userIdByJwt = tokenUtils.getUserId();
             ModifyRes modifyRes = userService.modifyUser(userIdByJwt, modifyReq);
             return new BaseResponse<>(modifyRes);
 
@@ -188,10 +188,10 @@ public class UserController {
             @ApiResponse(responseCode = "4000", description = "데이터베이스 연결에 실패하였습니다.")
     })
     @ResponseBody
-    @PatchMapping("")
+    @PatchMapping("/emergency")
     public BaseResponse<PatchUserRes> modifyEmergency(@Parameter(required = true) @RequestBody ModifyEmergencyReq modifyEmergencyReq) {
         try {
-            int userIdByJwt = tokenService.getUserId();
+            int userIdByJwt = tokenUtils.getUserId();
             userService.modifyEmergencyContact(userIdByJwt, modifyEmergencyReq);
             return new BaseResponse<>(new PatchUserRes(userIdByJwt));
 
@@ -217,11 +217,13 @@ public class UserController {
     @DeleteMapping("")
     public BaseResponse<PatchUserRes> deleteUser() {
         try {
-            int userIdByJwt = tokenService.getUserId();
+            int userIdByJwt = tokenUtils.getUserId();
             userService.deleteUser(userIdByJwt);
             return new BaseResponse<>(new PatchUserRes(userIdByJwt));
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    // 추가해야할 것 비밀번호 수정, device token 발급, refresh token 도입 여부, 로그아웃
 }

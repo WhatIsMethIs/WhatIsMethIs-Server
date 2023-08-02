@@ -1,6 +1,5 @@
-package com.WhatIsMethIs.repository;
-import com.WhatIsMethIs.entity.User;
-import org.hibernate.annotations.Where;
+package com.WhatIsMethIs.src.repository;
+import com.WhatIsMethIs.src.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
