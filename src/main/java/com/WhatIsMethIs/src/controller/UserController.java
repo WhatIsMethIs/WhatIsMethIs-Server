@@ -93,10 +93,10 @@ public class UserController {
     })
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<UserRes> createUser(@Parameter @RequestBody UserReq userReq) {
+    public BaseResponse<PostRes> createUser(@Parameter @RequestBody PostReq postReq) {
         try {
-            UserRes userRes = userService.createUser(userReq);
-            return new BaseResponse<>(userRes);
+            PostRes postRes = userService.createUser(postReq);
+            return new BaseResponse<>(postRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -118,31 +118,58 @@ public class UserController {
     })
     @ResponseBody
     @PostMapping("/login")
-    public BaseResponse<UserRes> login(@Parameter(required = true, name="loginCode") @RequestParam String loginCode, @Parameter @RequestBody(required = false) LoginReq loginReq) {
+    public BaseResponse<PostRes> login(@Parameter(required = true, name="loginCode") @RequestParam String loginCode, @Parameter @RequestBody(required = false) PostLoginReq postLoginReq) {
         try {
-            UserRes userRes;
+            PostRes postRes;
             if (loginCode == null) {
                 throw new BaseException(INVALID_REQ_PARAM);
             } else if (loginCode.equals("email")) {
                 // 기본 로그인
-                userRes = userService.emailLogin(loginReq);
+                postRes = userService.emailLogin(postLoginReq);
             } else if(loginCode.equals("kakao")) {
                 // 카카오 로그인
                 String accessToken = tokenUtils.getAccessToken();
-                userRes = userService.kakaoLogin(accessToken);
+                postRes = userService.kakaoLogin(accessToken);
             } else if(loginCode.equals("apple")) {
                 // 애플 로그인
                 String accessToken = tokenUtils.getAccessToken();
-                userRes = userService.appleLogin(accessToken);
+                postRes = userService.appleLogin(accessToken);
             } else {
                 throw new BaseException(INVALID_REQ_PARAM);
             }
-            if (userRes.getId()<0) {
-                return new BaseResponse<>(userRes);
+            if (postRes.getId()<0) {
+                return new BaseResponse<>(postRes);
             }
-            return new BaseResponse<>(userRes);
+            return new BaseResponse<>(postRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 1.2.3 Refresh Token으로 자동로그인
+     * [POST] /users/refreshToken
+     */
+    @Operation(method = "POST",
+            description = "Header-'X-ACCESS-TOKEN'에 refreshToken 값을 넣어 자동 로그인 api(jwt와 refresh token 모두 새로 발급)",
+            tags = "USER", summary = "Refresh Token 로그인 API - \uD83D\uDD12 refreshToken")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청에 성공하였습니다."),
+            @ApiResponse(responseCode = "2000", description = "JWT를 입력해주세요."),
+            @ApiResponse(responseCode = "2001", description = "유효하지 않은 JWT입니다."),
+            @ApiResponse(responseCode = "4000", description = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(responseCode = "4001", description = "데이터가 존재하지 않습니다.")
+    })
+    @ResponseBody
+    @PostMapping("/refreshToken")
+    public BaseResponse<PostRes> loginRefreshToken() throws BaseException {
+        try {
+            String accessToken = tokenUtils.getJwt();
+            int index = tokenUtils.getUserId();
+            PostRes postRes = userService.loginRefreshToken(index, accessToken);
+            return new BaseResponse<>(postRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
         }
     }
 
@@ -162,11 +189,11 @@ public class UserController {
     })
     @ResponseBody
     @PatchMapping("")
-    public BaseResponse<ModifyRes> modifyUser(@Parameter(required = true) @RequestBody ModifyReq modifyReq) {
+    public BaseResponse<PatchRes> modifyUser(@Parameter(required = true) @RequestBody PatchReq patchReq) {
         try {
             int userIdByJwt = tokenUtils.getUserId();
-            ModifyRes modifyRes = userService.modifyUser(userIdByJwt, modifyReq);
-            return new BaseResponse<>(modifyRes);
+            PatchRes patchRes = userService.modifyUser(userIdByJwt, patchReq);
+            return new BaseResponse<>(patchRes);
 
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -189,14 +216,41 @@ public class UserController {
     })
     @ResponseBody
     @PatchMapping("/emergency")
-    public BaseResponse<PatchUserRes> modifyEmergency(@Parameter(required = true) @RequestBody ModifyEmergencyReq modifyEmergencyReq) {
+    public BaseResponse<PatchRes> modifyEmergency(@Parameter(required = true) @RequestBody PatchEmergencyReq patchEmergencyReq) {
         try {
             int userIdByJwt = tokenUtils.getUserId();
-            userService.modifyEmergencyContact(userIdByJwt, modifyEmergencyReq);
-            return new BaseResponse<>(new PatchUserRes(userIdByJwt));
+            userService.modifyEmergencyContact(userIdByJwt, patchEmergencyReq);
+            return new BaseResponse<>(new PatchRes(userIdByJwt));
 
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 1.3.3 Device token 저장
+     * [PATCH] /users/deviceToken
+     */
+
+    @Operation(method = "PATCH",
+            description = "Header-'X-ACCESS-TOKEN'에 JWT 값을 넣어 device token 저장 api",
+            tags = "USER", summary = "1.3.3 Device Token 저장 - \uD83D\uDD12 JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청에 성공하였습니다."),
+            @ApiResponse(responseCode = "2000", description = "JWT를 입력해주세요."),
+            @ApiResponse(responseCode = "2001", description = "유효하지 않은 JWT입니다."),
+            @ApiResponse(responseCode = "4000", description = "데이터베이스 연결에 실패하였습니다."),
+            @ApiResponse(responseCode = "4001", description = "데이터가 존재하지 않습니다.")
+    })
+    @ResponseBody
+    @PatchMapping("/deviceToken")
+    public BaseResponse<PatchRes> saveDeviceToken(@Parameter @RequestBody PatchDeviceTokenReq patchDeviceTokenReq) throws BaseException {
+        try {
+            int userIdByJwt= tokenUtils.getUserId();
+            PatchRes patchRes = userService.saveDeviceToken(userIdByJwt, patchDeviceTokenReq.getDeviceToken());
+            return new BaseResponse<>(patchRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
         }
     }
 
@@ -215,15 +269,15 @@ public class UserController {
     })
     @ResponseBody
     @DeleteMapping("")
-    public BaseResponse<PatchUserRes> deleteUser() {
+    public BaseResponse<PatchRes> deleteUser() {
         try {
             int userIdByJwt = tokenUtils.getUserId();
             userService.deleteUser(userIdByJwt);
-            return new BaseResponse<>(new PatchUserRes(userIdByJwt));
+            return new BaseResponse<>(new PatchRes(userIdByJwt));
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
 
-    // 추가해야할 것 비밀번호 수정, device token 발급, refresh token 도입 여부, 로그아웃
+
 }
