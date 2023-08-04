@@ -7,8 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserRes {
+public class PostRes {
     private int id;
     private String email;
     private String jwt;
+    private String refreshToken;
 }

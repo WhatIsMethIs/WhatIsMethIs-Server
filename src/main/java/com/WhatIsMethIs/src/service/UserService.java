@@ -11,7 +11,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
 import java.util.List;
 
 import static com.WhatIsMethIs.config.BaseResponseStatus.*;
@@ -54,26 +53,28 @@ public class UserService {
     }
 
     // 회원가입
-    public UserRes createUser(UserReq userReq) throws BaseException {
-
-        if(!isRegexEmail(userReq.getEmail())){
+    @Transactional
+    public PostRes createUser(PostReq postReq) throws BaseException {
+        if(!isRegexEmail(postReq.getEmail())){
             throw new BaseException(POST_USERS_INVALID_EMAIL);
-        }else if(!isRegexPhoneNumber(userReq.getPhoneNumber())){
+        }else if(!isRegexPhoneNumber(postReq.getPhoneNumber())){
             throw new BaseException(POST_USERS_INVALID_PHONENUMBER);
         }else {
-            User emailCheck = userRepository.findByEmail(userReq.getEmail()).orElse(null);
+            User emailCheck = userRepository.findByEmail(postReq.getEmail()).orElse(null);
             if (emailCheck == null){
                 try {
                     String password;
-                    password = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(userReq.getPassword());
-                    userReq.setPassword(password);
+                    password = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(postReq.getPassword());
+                    postReq.setPassword(password);
                 } catch (Exception ignored) {
                     throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
                 }
                 try {
-                    User user = userReq.toEntity();
+                    User user = postReq.toEntity();
                     userRepository.save(user);
-                    return new UserRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()));
+                    String refreshToken = tokenUtils.createRefreshToken(user.getId());
+                    user.saveRefreshToken(refreshToken);
+                    return new PostRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()), refreshToken);
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     throw new BaseException(DATABASE_ERROR);
@@ -85,8 +86,9 @@ public class UserService {
     }
 
     // 이메일 로그인
-    public UserRes emailLogin(LoginReq loginReq) throws BaseException {
-        String email = loginReq.getEmail();
+    @Transactional
+    public PostRes emailLogin(PostLoginReq postLoginReq) throws BaseException {
+        String email = postLoginReq.getEmail();
         if (email == null || email.isEmpty()) {
             throw new BaseException(POST_USERS_EMPTY_EMAIL);
         }
@@ -101,8 +103,10 @@ public class UserService {
             } catch (Exception ignored) {
                 throw new BaseException(PASSWORD_DECRYPTION_ERROR);
             }
-            if (loginReq.getPassword().equals(password)) {
-                return new UserRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()));
+            if (postLoginReq.getPassword().equals(password)) {
+                String refreshToken = tokenUtils.createRefreshToken(user.getId());
+                user.saveRefreshToken(refreshToken);
+                return new PostRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()), refreshToken);
             }
             else {
                 throw new BaseException(FAIL_TO_LOGIN);
@@ -113,39 +117,57 @@ public class UserService {
     }
 
     // 카카오 로그인
-    public UserRes kakaoLogin(String accessToken) throws BaseException {
+    public PostRes kakaoLogin(String accessToken) throws BaseException {
         User user = socialLoginService.getKakaoUserByAccessToken(accessToken);
         if (user != null) {
-            return new UserRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()));
+            String refreshToken = tokenUtils.createRefreshToken(user.getId());
+            user.saveRefreshToken(refreshToken);
+            return new PostRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()), refreshToken);
         } else {
-            return new UserRes(-1, "", "");
+            return new PostRes(-1, "", "", "");
         }
     }
 
     // 애플 로그인
-    public UserRes appleLogin(String accessToken) throws BaseException {
+    public PostRes appleLogin(String accessToken) throws BaseException {
         User user = socialLoginService.getAppleUserByAccessToken(accessToken);
         if (user != null) {
-            return new UserRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()));
+            String refreshToken = tokenUtils.createRefreshToken(user.getId());
+            user.saveRefreshToken(refreshToken);
+            return new PostRes(user.getId(), user.getEmail(), tokenUtils.createJwt(user.getId()), refreshToken);
         } else {
-            return new UserRes(-1, "", "");
+            return new PostRes(-1, "", "", "");
         }
     }
 
-    // User 수정 // 수정하기
+    // 자동로그인
+    public PostRes loginRefreshToken(int index, String accessToken) throws BaseException {
+
+        User user = userRepository.findById(index).orElse(null);
+        if (user.getRefreshToken().equals(accessToken)){
+            // refresh token 유효 -> jwt 재발급
+            String jwt = tokenUtils.createJwt(index);
+            String refreshToken = tokenUtils.createRefreshToken(index);
+            user.saveRefreshToken(refreshToken);
+            return new PostRes(index, user.getEmail(), jwt, refreshToken);
+        } else {
+            throw new BaseException(INVALID_JWT);
+        }
+    }
+
+    // User 수정
     @Transactional
-    public ModifyRes modifyUser(int index, ModifyReq modifyReq) throws BaseException {
-        if(!isRegexEmail(modifyReq.getEmail())){
+    public PatchRes modifyUser(int index, PatchReq patchReq) throws BaseException {
+        if(!isRegexEmail(patchReq.getEmail())){
             throw new BaseException(POST_USERS_INVALID_EMAIL);
-        }else if(!isRegexPhoneNumber(modifyReq.getPhoneNumber())){
+        }else if(!isRegexPhoneNumber(patchReq.getPhoneNumber())){
             throw new BaseException(POST_USERS_INVALID_PHONENUMBER);
         } else {
             try {
-
                 User user = userRepository.findById(index).orElse(null);
                 if (user != null && user.getId() == index) {
-                    user.modify(modifyReq);
-                    return new ModifyRes(user.getId());
+                    user.modify(patchReq);
+                    return new PatchRes(user.getId());
                 } else {
                     throw new BaseException(USER_NOT_EXIST);
                 }
@@ -156,10 +178,27 @@ public class UserService {
         }
     }
 
+    // device token 저장
+    @Transactional
+    public PatchRes saveDeviceToken(int index, String str) throws  BaseException {
+        try {
+            User user = userRepository.findById(index).orElse(null);
+            if (user != null && user.getId() == index) {
+                user.saveDeviceToken(str);
+                return new PatchRes(user.getId());
+            } else {
+                throw new BaseException(USER_NOT_EXIST);
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 
     // 비상연락망 등록 및 수정
     @Transactional
-    public ModifyRes modifyEmergencyContact(int index, ModifyEmergencyReq modifyReq) throws BaseException {
+    public PatchRes modifyEmergencyContact(int index, PatchEmergencyReq modifyReq) throws BaseException {
         if(!isRegexPhoneNumber(modifyReq.getContact1()) || !isRegexPhoneNumber(modifyReq.getContact2()) || !isRegexPhoneNumber(modifyReq.getContact3())){
             throw new BaseException(POST_USERS_INVALID_PHONENUMBER);
         }else {
@@ -167,7 +206,7 @@ public class UserService {
                 User user = userRepository.findById(index).orElse(null);
                 if (user != null) {
                     user.modifyEmergencyContact(modifyReq);
-                    return new ModifyRes(user.getId());
+                    return new PatchRes(user.getId());
                 } else {
                     throw new BaseException(USER_NOT_EXIST);
                 }

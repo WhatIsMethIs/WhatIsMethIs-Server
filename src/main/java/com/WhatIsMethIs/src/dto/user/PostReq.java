@@ -6,7 +6,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserReq {
+public class PostReq {
     private String email;
     private String password;
     private String name;
@@ -14,7 +14,7 @@ public class UserReq {
     private String phoneNumber;
 
     @Builder
-    public UserReq(String email, String password, String name, String age, String phoneNumber){
+    public PostReq(String email, String password, String name, String age, String phoneNumber){
         this.email = email;
         this.password = password;
         this.name = name;

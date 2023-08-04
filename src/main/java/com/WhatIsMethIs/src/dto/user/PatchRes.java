@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ModifyRes {
+public class PatchRes {
     private int id;
 }

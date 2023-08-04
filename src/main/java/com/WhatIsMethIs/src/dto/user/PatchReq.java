@@ -4,7 +4,7 @@ import lombok.*;
 
 @Getter
 @NoArgsConstructor
-public class ModifyReq {
+public class PatchReq {
     private String email;
     private String name;
     private String age;

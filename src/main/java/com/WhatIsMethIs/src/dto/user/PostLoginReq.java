@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LoginReq {
+public class PostLoginReq {
     private String email;
     private String password;
 }
