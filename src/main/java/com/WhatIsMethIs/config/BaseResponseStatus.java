@@ -23,7 +23,7 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_EMAIL(false, 2010, "이메일을 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 2011, "이메일 형식을 확인해주세요."),
     POST_USERS_INVALID_PHONENUMBER(false, 2012, "전화번호 형식을 확인해주세요."),
-    POST_USERS_EXIST_EMAIL(false,2013,"이미 가입한 이메일입니다."),
+    EXIST_EMAIL(false,2013,"이미 가입한 이메일입니다."),
 
     /**
      * 3000 : Response 오류
@@ -33,8 +33,10 @@ public enum BaseResponseStatus {
     FAIL_TO_GET_EMAIL(false, 3001, "이메일 정보를 가져오는데 실패하였습니다."),
     FAIL_TO_RESPONSE_KAKAO(false, 3002, "카카오 api 호출 응답 정보를 불러오는데 실패하였습니다."),
     FAIL_TO_RESPONSE_APPLE(false, 3003, "애플 api 호출 응답 정보를 불러오는데 실패하였습니다."),
-    FAIL_TO_FIND_AVALIABLE_RSA(false,3004,"사용 가능한 공개키가 없습니다."),
+    FAIL_TO_FIND_AVALIABLE_RSA(false,3004,"애플 api 호출 중 사용 가능한 공개키가 없어 실패하였습니다."),
     USER_NOT_EXIST(false, 3005, "유저가 존재하지 않습니다."),
+    LOGIN_TO_EMAIL(false, 3006, "이메일 가입 사용자입니다."),
+    WRONG_PASSWORD(false,3007,"비밀번호가 틀렸습니다."),
 
 
 
@@ -42,8 +44,8 @@ public enum BaseResponseStatus {
      * 4000 : Database, Server 오류
      */
     DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패하였습니다."),
-    PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_ENCRYPTION_ERROR(false, 4010, "비밀번호 암호화에 실패하였습니다."),
+    PASSWORD_DECRYPTION_ERROR(false, 4011, "비밀번호 복호화에 실패하였습니다.");
     private final boolean isSuccess;
     private final int code;
     private final String message;

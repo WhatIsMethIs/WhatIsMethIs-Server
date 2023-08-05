@@ -1,20 +1,25 @@
 package com.WhatIsMethIs.src.dto.user;
 
 import com.WhatIsMethIs.src.entity.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostReq {
+@Schema
+public class PostJoinReq {
     private String email;
+    @Schema(example = "null")
     private String password;
     private String name;
     private String age;
     private String phoneNumber;
+    @Schema(example = "email/kakao/apple, 대소문자 상관 X")
+    private String loginCode;
 
     @Builder
-    public PostReq(String email, String password, String name, String age, String phoneNumber){
+    public PostJoinReq(String email, String password, String name, String age, String phoneNumber){
         this.email = email;
         this.password = password;
         this.name = name;
@@ -29,6 +34,7 @@ public class PostReq {
                 .name(name)
                 .age(age)
                 .phoneNumber(phoneNumber)
+                .loginCode(loginCode)
                 .build();
     }
 }
