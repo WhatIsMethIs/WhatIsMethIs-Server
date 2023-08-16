@@ -1,4 +1,4 @@
-package com.WhatIsMethIs.entity;
+package com.WhatIsMethIs.src.entity;
 
 import lombok.Getter;
 
