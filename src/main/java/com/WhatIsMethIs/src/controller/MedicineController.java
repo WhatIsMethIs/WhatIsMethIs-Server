@@ -1,8 +1,6 @@
 package com.WhatIsMethIs.src.controller;
 
-import com.WhatIsMethIs.config.BaseException;
 import com.WhatIsMethIs.config.BaseResponse;
-import com.WhatIsMethIs.src.dto.medicine.MedicineDto;
 import com.WhatIsMethIs.src.dto.medicine.MedicineResponseDto;
 import com.WhatIsMethIs.src.service.MedicineService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,14 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,11 +28,14 @@ public class MedicineController {
     @GetMapping("")
     public BaseResponse<MedicineResponseDto> getMedicines(@RequestParam HashMap<String, String> paramMap) throws IOException {
         MedicineResponseDto medicineResponseDto = null;
-
+        
         int pageNo = Integer.parseInt(paramMap.get("pageNo"));
-        if(paramMap.containsKey("itemName")){
+        if(paramMap.containsKey("itemName") && !paramMap.containsKey("itemSeq")){
             medicineResponseDto = medicineService.getMedicinesFromOpenApiByItemName(paramMap.get("itemName"), pageNo);
         }
+        /*else if(!paramMap.containsKey("itemName") && paramMap.containsKey("itemSeq")){
+            medicineResponseDto = medicineService.
+        }*/
         else{
             medicineResponseDto = medicineService.getMedicinesFromOpenApi(pageNo);
         }
