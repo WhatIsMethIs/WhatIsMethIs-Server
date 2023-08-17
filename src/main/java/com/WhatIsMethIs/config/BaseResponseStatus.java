@@ -45,7 +45,13 @@ public enum BaseResponseStatus {
      */
     DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패하였습니다."),
     PASSWORD_ENCRYPTION_ERROR(false, 4010, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4011, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_DECRYPTION_ERROR(false, 4011, "비밀번호 복호화에 실패하였습니다."),
+
+    /**
+     * 5000 : OpenApi 오류
+     */
+    OPEN_API_ERROR(false, 5000, "Open Api 연결에 실패하셨습니다.");
+
     private final boolean isSuccess;
     private final int code;
     private final String message;

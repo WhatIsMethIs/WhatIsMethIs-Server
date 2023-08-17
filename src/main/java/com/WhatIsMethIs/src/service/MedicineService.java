@@ -31,7 +31,7 @@ public class MedicineService {
     private final int numOfRows = 10;
     private final String openApiResponseType = "json";
 
-    public MedicineResponseDto getMedicinesFromOpenApi(int pageNo) throws IOException {
+    public MedicineResponseDto getMedicinesFromOpenApi(int pageNo) throws IOException, BaseException {
         String apiUrl = openApiEndPoint + "?" +
                 "serviceKey=" + openApiserviceKey +
                 "&pageNo=" + pageNo +
@@ -51,6 +51,10 @@ public class MedicineService {
         bufferdReader.close();
 
         String response = stringBuilder.toString();
+
+        if(response.startsWith("<")){
+            throw new BaseException(OPEN_API_ERROR);
+        }
 
         JSONObject jsonObjectBody = new JSONObject(response).getJSONObject("body");
 
@@ -110,12 +114,14 @@ public class MedicineService {
             }
 
             medicineResponseDto.getMedicines().add(medicineDto);
+
+            //medicineRepository.save(Medicine.toEntity(medicineDto));
         }
 
         return medicineResponseDto;
     }
 
-    public MedicineResponseDto getMedicinesFromOpenApiByItemName(String itemName, int pageNo) throws IOException {
+    public MedicineResponseDto getMedicinesFromOpenApiByItemName(String itemName, int pageNo) throws IOException, BaseException {
         String apiUrl = openApiEndPoint + "?" +
                 "serviceKey=" + openApiserviceKey +
                 "&pageNo=" + pageNo +
@@ -136,6 +142,10 @@ public class MedicineService {
         bufferdReader.close();
 
         String response = stringBuilder.toString();
+
+        if(response.startsWith("<")){
+            throw new BaseException(OPEN_API_ERROR);
+        }
 
         MedicineResponseDto medicineResponseDto = null;
         if(new JSONObject(response).keySet().contains("body")){
@@ -197,8 +207,100 @@ public class MedicineService {
                 }
 
                 medicineResponseDto.getMedicines().add(medicineDto);
+
+                //medicineRepository.save(Medicine.toEntity(medicineDto));
             }
 
+        }
+
+        return medicineResponseDto;
+    }
+
+    public MedicineResponseDto getMedicinesFromOpenApiByItemSeq(String itemSeq) throws IOException, BaseException {
+        String apiUrl = openApiEndPoint + "?" +
+                "serviceKey=" + openApiserviceKey +
+                "&itemSeq=" + itemSeq +
+                "&numOfRows=" + numOfRows +
+                "&type=" + openApiResponseType;
+        URL url = new URL(apiUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+
+        BufferedReader bufferdReader = new BufferedReader((new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8)));
+        StringBuilder stringBuilder = new StringBuilder();
+        String inputLIne;
+
+        while((inputLIne = bufferdReader.readLine()) != null){
+            stringBuilder.append(inputLIne);
+        }
+        bufferdReader.close();
+
+        String response = stringBuilder.toString();
+
+        if(response.startsWith("<")){
+            throw new BaseException(OPEN_API_ERROR);
+        }
+
+        JSONObject jsonObjectBody = new JSONObject(response).getJSONObject("body");
+
+        MedicineResponseDto medicineResponseDto = new MedicineResponseDto();
+
+        medicineResponseDto.setPageNo(jsonObjectBody.getInt("pageNo"));
+        medicineResponseDto.setTotalCount(jsonObjectBody.getInt("totalCount"));
+        medicineResponseDto.setNumOfRows(jsonObjectBody.getInt("numOfRows"));
+
+        JSONArray jsonItems = jsonObjectBody.getJSONArray("items");
+        for(Object item : jsonItems){
+            JSONObject jsonItem = (JSONObject) item;
+
+            MedicineDto medicineDto = new MedicineDto();
+
+            if(!jsonItem.get("entpName").equals(null)){
+                medicineDto.setEntpName(jsonItem.getString("entpName"));
+            }
+            if(!jsonItem.get("itemName").equals(null)){
+                medicineDto.setItemName(jsonItem.getString("itemName"));
+            }
+            if(!jsonItem.get("itemSeq").equals(null)){
+                medicineDto.setItemSeq(jsonItem.getString("itemSeq"));
+            }
+            if(!jsonItem.get("efcyQesitm").equals(null)){
+                medicineDto.setEfcyQesitm(jsonItem.getString("efcyQesitm"));
+            }
+            if(!jsonItem.get("useMethodQesitm").equals(null)){
+                medicineDto.setUseMethodQesitm(jsonItem.getString("useMethodQesitm"));
+            }
+            if(!jsonItem.get("atpnWarnQesitm").equals(null)){
+                medicineDto.setAtpnWarnQesitm(jsonItem.getString("atpnWarnQesitm"));
+            }
+            if(!jsonItem.get("atpnQesitm").equals(null)){
+                medicineDto.setAtpnQesitm(jsonItem.getString("atpnQesitm"));
+            }
+            if(!jsonItem.get("intrcQesitm").equals(null)){
+                medicineDto.setIntrcQesitm(jsonItem.getString("intrcQesitm"));
+            }
+            if(!jsonItem.get("seQesitm").equals(null)){
+                medicineDto.setSeQesitm(jsonItem.getString("seQesitm"));
+            }
+            if(!jsonItem.get("depositMethodQesitm").equals(null)){
+                medicineDto.setDepositMethodQesitm(jsonItem.getString("depositMethodQesitm"));
+            }
+            if(!jsonItem.get("openDe").equals(null)){
+                medicineDto.setOpenDe(jsonItem.getString("openDe"));
+            }
+            if(!jsonItem.get("updateDe").equals(null)){
+                medicineDto.setUpdateDe(jsonItem.getString("updateDe"));
+            }
+            if(!jsonItem.get("itemImage").equals(null)){
+                medicineDto.setItemImage(jsonItem.getString("itemImage"));
+            }
+            if(!jsonItem.get("bizrno").equals(null)){
+                medicineDto.setBizrno(jsonItem.getString("bizrno"));
+            }
+
+            medicineResponseDto.getMedicines().add(medicineDto);
+
+            medicineRepository.save(Medicine.toEntity(medicineDto));
         }
 
         return medicineResponseDto;
@@ -211,6 +313,30 @@ public class MedicineService {
             e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    public MedicineResponseDto getMedicinesByItemSeq(String itemSeq) throws BaseException {
+        MedicineResponseDto medicineResponseDto = null;
+
+        Medicine medicine = medicineRepository.findById(itemSeq).orElse(null);
+        try{
+            if(medicine == null){
+                medicineResponseDto = getMedicinesFromOpenApiByItemSeq(itemSeq);
+            }
+            else{
+                medicineResponseDto = new MedicineResponseDto();
+                medicineResponseDto.setPageNo(1);
+                medicineResponseDto.setTotalCount(1);
+                medicineResponseDto.setNumOfRows(1);
+                medicineResponseDto.getMedicines().add(MedicineDto.toDto(medicine));
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        return medicineResponseDto;
     }
 
 
