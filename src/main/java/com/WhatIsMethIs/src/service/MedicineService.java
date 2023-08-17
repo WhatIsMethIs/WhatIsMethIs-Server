@@ -31,7 +31,7 @@ public class MedicineService {
     private final int numOfRows = 10;
     private final String openApiResponseType = "json";
 
-    public MedicineResponseDto getMedicinesFromOpenApi(int pageNo) throws IOException {
+    public MedicineResponseDto getMedicinesFromOpenApi(int pageNo) throws IOException, BaseException {
         String apiUrl = openApiEndPoint + "?" +
                 "serviceKey=" + openApiserviceKey +
                 "&pageNo=" + pageNo +
@@ -51,6 +51,10 @@ public class MedicineService {
         bufferdReader.close();
 
         String response = stringBuilder.toString();
+
+        if(response.startsWith("<")){
+            throw new BaseException(OPEN_API_ERROR);
+        }
 
         JSONObject jsonObjectBody = new JSONObject(response).getJSONObject("body");
 
@@ -111,13 +115,13 @@ public class MedicineService {
 
             medicineResponseDto.getMedicines().add(medicineDto);
 
-            medicineRepository.save(Medicine.toEntity(medicineDto));
+            //medicineRepository.save(Medicine.toEntity(medicineDto));
         }
 
         return medicineResponseDto;
     }
 
-    public MedicineResponseDto getMedicinesFromOpenApiByItemName(String itemName, int pageNo) throws IOException {
+    public MedicineResponseDto getMedicinesFromOpenApiByItemName(String itemName, int pageNo) throws IOException, BaseException {
         String apiUrl = openApiEndPoint + "?" +
                 "serviceKey=" + openApiserviceKey +
                 "&pageNo=" + pageNo +
@@ -138,6 +142,10 @@ public class MedicineService {
         bufferdReader.close();
 
         String response = stringBuilder.toString();
+
+        if(response.startsWith("<")){
+            throw new BaseException(OPEN_API_ERROR);
+        }
 
         MedicineResponseDto medicineResponseDto = null;
         if(new JSONObject(response).keySet().contains("body")){
@@ -200,7 +208,7 @@ public class MedicineService {
 
                 medicineResponseDto.getMedicines().add(medicineDto);
 
-                medicineRepository.save(Medicine.toEntity(medicineDto));
+                //medicineRepository.save(Medicine.toEntity(medicineDto));
             }
 
         }
@@ -208,10 +216,10 @@ public class MedicineService {
         return medicineResponseDto;
     }
 
-    public MedicineResponseDto getMedicinesFromOpenApiByItemSeq(String itemSeq) throws IOException {
+    public MedicineResponseDto getMedicinesFromOpenApiByItemSeq(String itemSeq) throws IOException, BaseException {
         String apiUrl = openApiEndPoint + "?" +
                 "serviceKey=" + openApiserviceKey +
-                "&=itemSeq" + itemSeq +
+                "&itemSeq=" + itemSeq +
                 "&numOfRows=" + numOfRows +
                 "&type=" + openApiResponseType;
         URL url = new URL(apiUrl);
@@ -228,6 +236,10 @@ public class MedicineService {
         bufferdReader.close();
 
         String response = stringBuilder.toString();
+
+        if(response.startsWith("<")){
+            throw new BaseException(OPEN_API_ERROR);
+        }
 
         JSONObject jsonObjectBody = new JSONObject(response).getJSONObject("body");
 
