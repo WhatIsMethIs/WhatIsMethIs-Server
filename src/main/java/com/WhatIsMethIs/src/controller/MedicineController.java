@@ -1,17 +1,15 @@
 package com.WhatIsMethIs.src.controller;
 
+import com.WhatIsMethIs.config.BaseResponse;
+import com.WhatIsMethIs.src.dto.medicine.MedicineResponseDto;
 import com.WhatIsMethIs.src.service.MedicineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,37 +18,28 @@ import java.nio.charset.StandardCharsets;
 public class MedicineController {
     private final MedicineService medicineService;
 
-    private final String openApiEndPoint = "http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList";
-    private final String openApiserviceKey = "jn2o5j7ULjTWI9MuM0HbTPpUUOaIATwvwylC36Oed1AHs5mqh0rSDynNyuDROqOsn4ZcyZ9LUUMgixImyDNkhQ%3D%3D";
-    private final int numOfRows = 10;
-    private final String openApiResponseType = "json";
-
-    /***
+    /**
      * 2.1.1 약물 정보 전체 조회
-     * [GET] /medicines?pageNo={pageNo}
+     * 2.1.2 약물명으로 검색
+     * [GET] /medicines?pageNo={pageNo}&itemName={itemName}
      */
     @Operation(method = "GET", description = "약물 정보 전체를 조회하는 api로, 10개를 한 페이지로 제공", tags = "MEDICINE", summary = "2.1.1 약물 정보 전체 조회")
     @ResponseBody
     @GetMapping("")
-    public String getMedicines(@RequestParam("pageNo") int pageNo) throws IOException {
-        String apiUrl = openApiEndPoint + "?" +
-                "serviceKey=" + openApiserviceKey +
-                "&pageNo=" + pageNo +
-                "&numOfRows=" + numOfRows +
-                "&type=" + openApiResponseType;
-        URL url = new URL(apiUrl);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
-
-        BufferedReader bufferdReader = new BufferedReader((new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8)));
-        StringBuilder stringBuilder = new StringBuilder();
-        String inputLIne;
-
-        while((inputLIne = bufferdReader.readLine()) != null){
-            stringBuilder.append(inputLIne);
+    public BaseResponse<MedicineResponseDto> getMedicines(@RequestParam HashMap<String, String> paramMap) throws IOException {
+        MedicineResponseDto medicineResponseDto = null;
+        
+        int pageNo = Integer.parseInt(paramMap.get("pageNo"));
+        if(paramMap.containsKey("itemName") && !paramMap.containsKey("itemSeq")){
+            medicineResponseDto = medicineService.getMedicinesFromOpenApiByItemName(paramMap.get("itemName"), pageNo);
         }
-        bufferdReader.close();
+        /*else if(!paramMap.containsKey("itemName") && paramMap.containsKey("itemSeq")){
+            medicineResponseDto = medicineService.
+        }*/
+        else{
+            medicineResponseDto = medicineService.getMedicinesFromOpenApi(pageNo);
+        }
 
-        return stringBuilder.toString();
+        return new BaseResponse<>(medicineResponseDto);
     }
 }
