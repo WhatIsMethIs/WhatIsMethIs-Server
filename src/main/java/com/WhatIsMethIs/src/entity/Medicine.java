@@ -14,16 +14,6 @@ public class Medicine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
-    @Column(length = 4, nullable = false)
-    public String resultCode;
-    @Column(length = 50, nullable = false)
-    public String resultMsg;
-    @Column
-    public int numOfRows;
-    @Column
-    public int pageNo;
-    @Column
-    public int totalCount;
     @Column(length = 4000)
     public String entpName;
     @Column(length = 4000)
@@ -50,4 +40,6 @@ public class Medicine {
     public String updateDe;
     @Column
     public String itemImage;
+    @Column
+    public String bizrno;
 }
