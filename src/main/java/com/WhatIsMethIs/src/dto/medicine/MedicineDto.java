@@ -7,11 +7,6 @@ import lombok.Setter;
 @Setter
 public class MedicineDto {
     private int id;
-    private String resultCode;
-    private String resultMsg;
-    private int numOfRows;
-    private int pageNo;
-    private int totalCount;
     private String entpName;
     private String itemName;
     private String itemSeq;
@@ -25,4 +20,5 @@ public class MedicineDto {
     private String openDe;
     private String updateDe;
     private String itemImage;
+    private String bizrno;
 }
