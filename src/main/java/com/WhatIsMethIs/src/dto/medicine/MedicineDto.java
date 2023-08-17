@@ -25,46 +25,46 @@ public class MedicineDto {
     public static MedicineDto toDto(Medicine medicine){
         MedicineDto medicineDto = new MedicineDto();
 
-        if(!medicine.getEntpName().equals(null)){
+        if(medicine.getEntpName() != null){
             medicineDto.setEntpName(medicine.getEntpName());
         }
-        if(!medicine.getItemName().equals(null)){
+        if(medicine.getItemName() != null){
             medicineDto.setItemName(medicine.getItemName());
         }
-        if(!medicine.getItemSeq().equals(null)){
+        if(medicine.getItemSeq() != null){
             medicineDto.setItemSeq(medicine.getItemSeq());
         }
-        if(!medicine.getEfcyQesitm().equals(null)){
+        if(medicine.getEfcyQesitm() != null){
             medicineDto.setEfcyQesitm(medicine.getEfcyQesitm());
         }
-        if(!medicine.getUseMethodQesitm().equals(null)){
+        if(medicine.getUseMethodQesitm() != null){
             medicineDto.setUseMethodQesitm(medicine.getUseMethodQesitm());
         }
-        if(!medicine.getAtpnWarnQesitm().equals(null)){
+        if(medicine.getAtpnWarnQesitm() != null){
             medicineDto.setAtpnWarnQesitm(medicine.getAtpnWarnQesitm());
         }
-        if(!medicine.getAtpnQesitm().equals(null)){
+        if(medicine.getAtpnQesitm() != null){
             medicineDto.setAtpnQesitm(medicine.getAtpnQesitm());
         }
-        if(!medicine.getIntrcQesitm().equals(null)){
+        if(medicine.getIntrcQesitm() != null){
             medicineDto.setIntrcQesitm(medicine.getIntrcQesitm());
         }
-        if(!medicine.getSeQesitm().equals(null)){
+        if(medicine.getSeQesitm() != null){
             medicineDto.setSeQesitm(medicineDto.getSeQesitm());
         }
-        if(!medicine.getDepositMethodQesitm().equals(null)){
+        if(medicine.getDepositMethodQesitm() != null){
             medicineDto.setDepositMethodQesitm(medicine.getDepositMethodQesitm());
         }
-        if(!medicine.getOpenDe().equals(null)){
+        if(medicine.getOpenDe() != null){
             medicineDto.setOpenDe(medicineDto.getOpenDe());
         }
-        if(!medicine.getUpdateDe().equals(null)){
+        if(medicine.getUpdateDe() != null){
             medicineDto.setUpdateDe(medicineDto.getUpdateDe());
         }
-        if(!medicine.getItemImage().equals(null)){
+        if(medicine.getItemImage() != null){
             medicineDto.setItemImage(medicine.getItemImage());
         }
-        if(!medicine.getBizrno().equals(null)){
+        if(medicine.getBizrno() != null){
             medicineDto.setBizrno(medicineDto.getBizrno());
         }
         return medicineDto;
