@@ -2,15 +2,21 @@ package com.WhatIsMethIs.src.controller;
 
 import com.WhatIsMethIs.config.BaseException;
 import com.WhatIsMethIs.config.BaseResponse;
+import com.WhatIsMethIs.src.dto.medicine.MedicineDto;
 import com.WhatIsMethIs.src.dto.medicine.MedicineResponseDto;
+import com.WhatIsMethIs.src.dto.medicine.PillImageDto;
 import com.WhatIsMethIs.src.service.MedicineService;
+import com.WhatIsMethIs.src.service.PillImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.WhatIsMethIs.config.BaseResponseStatus.OPEN_API_ERROR;
 
@@ -20,6 +26,7 @@ import static com.WhatIsMethIs.config.BaseResponseStatus.OPEN_API_ERROR;
 @Tag(name = "MEDICINE", description = "약물 정보 API")
 public class MedicineController {
     private final MedicineService medicineService;
+    private final PillImageService pillImageService;
 
     /**
      * 2.1.1 약물 정보 전체 조회
@@ -54,5 +61,30 @@ public class MedicineController {
         catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
+    }
+
+    /**
+     * TODO 2.1.4 약물 이미지로 식별
+     * [POST] /medicines/identify
+     */
+    @PostMapping("/identify")
+    public BaseResponse<MedicineResponseDto> postPillImageAndGetInfo(
+            @Valid @RequestParam("files") List<MultipartFile> images
+    )
+    {
+        MedicineResponseDto medicineResponseDto = null;
+
+        try{
+            // TODO 모델 서버에 식별 요청
+            // 현재는 이미지와 관계 없이 임의의 약물 정보 송신
+            medicineResponseDto = medicineService.getMedicinesByItemSeq("202001927");
+
+            // 이미지 로컬 디렉토리에 저장
+            pillImageService.addPillImage(images);
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+        return new BaseResponse<>(medicineResponseDto);
     }
 }

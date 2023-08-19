@@ -25,6 +25,8 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_PHONENUMBER(false, 2012, "전화번호 형식을 확인해주세요."),
     EXIST_EMAIL(false,2013,"이미 가입한 이메일입니다."),
 
+    FILE_NOT_FOUND_EXCEPTION(false, 2014, "파일이 없습니다."),
+
     /**
      * 3000 : Response 오류
      */
