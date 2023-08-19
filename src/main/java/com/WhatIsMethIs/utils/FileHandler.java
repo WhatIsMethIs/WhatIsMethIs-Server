@@ -77,9 +77,9 @@ public class FileHandler {
                 fileList.add(pillImageDto);
 
                 // 저장된 파일로 변경하여 이를 보여주기 위함
-                System.out.println(absolutePath + path + "/" + new_file_name);
                 file = new File(absolutePath + path + "/" + new_file_name);
                 multipartFile.transferTo(file);
+                System.out.println(absolutePath + path + "/" + new_file_name);
             }
         }
 
