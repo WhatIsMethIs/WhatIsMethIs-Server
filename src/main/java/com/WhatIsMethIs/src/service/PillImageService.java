@@ -28,6 +28,7 @@ public class PillImageService {
 
         try {
             List<PillImageDto> list = fileHandler.parseImageInfo(files);
+            System.out.println(list.isEmpty());
             if(list.isEmpty()){
                 throw new BaseException(BaseResponseStatus.FILE_NOT_FOUND_EXCEPTION);
             }
