@@ -82,6 +82,7 @@ public class FileHandler {
                 System.out.println(absolutePath + path + "/" + new_file_name);
             }
         }
+        System.out.println("debug at FileHandler");
 
         return fileList;
     }
