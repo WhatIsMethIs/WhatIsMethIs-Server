@@ -26,6 +26,7 @@ public enum BaseResponseStatus {
     EXIST_EMAIL(false,2013,"이미 가입한 이메일입니다."),
 
     FILE_NOT_FOUND_EXCEPTION(false, 2014, "파일이 없습니다."),
+    FILEHANDLER_FUNC_TRANFER_TO_EXCEPTION(false, 2015, "class FileHandler에서 transferTo 실행 중 IOException 발생"),
 
     /**
      * 3000 : Response 오류
