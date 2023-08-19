@@ -42,7 +42,7 @@ public class FileHandler {
         }
 
         // 파일 처리
-        System.out.println(multipartFiles.size());
+        System.out.println("size of multipartFiles" + multipartFiles.size());
         for (MultipartFile multipartFile : multipartFiles){
             // 파일이 비어 있지 않을 때 작업을 시작
             if(!multipartFile.isEmpty()){
