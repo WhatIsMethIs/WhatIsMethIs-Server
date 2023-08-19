@@ -1,5 +1,7 @@
 package com.WhatIsMethIs.utils;
 
+import com.WhatIsMethIs.config.BaseException;
+import com.WhatIsMethIs.config.BaseResponseStatus;
 import com.WhatIsMethIs.src.dto.medicine.PillImageDto;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -16,7 +18,7 @@ import java.util.List;
 public class FileHandler {
     public List<PillImageDto> parseImageInfo(
             List<MultipartFile> multipartFiles
-    ) throws IOException {
+    ) throws IOException, BaseException {
         // 반환을 할 파일 리스트
         List<PillImageDto> fileList = new ArrayList<>();
 
@@ -79,7 +81,12 @@ public class FileHandler {
 
                 // 저장된 파일로 변경하여 이를 보여주기 위함
                 file = new File(absolutePath + path + "/" + new_file_name);
-                multipartFile.transferTo(file);
+                try{
+                    multipartFile.transferTo(file);
+                }
+                catch (Exception e){
+                    throw new BaseException(BaseResponseStatus.FILEHANDLER_FUNC_TRANFER_TO_EXCEPTION);
+                }
                 System.out.println(absolutePath + path + "/" + new_file_name);
             }
         }
