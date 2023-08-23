@@ -1,5 +1,6 @@
 package com.WhatIsMethIs.src.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -54,6 +55,7 @@ public class Medication {
     private int takeCycle; // 1달: -1, 30일: +30
 
     @Column(name = "notification_time", nullable = true)
+    @JsonFormat(pattern="KK:mm")
     private LocalTime notificationTime;
 
     @Column(name = "description", nullable = false)
