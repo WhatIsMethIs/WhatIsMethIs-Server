@@ -2,6 +2,7 @@ package com.WhatIsMethIs.src.service;
 
 import com.WhatIsMethIs.config.BaseException;
 import com.WhatIsMethIs.config.exception.medication.NotMyMedicationException;
+import com.WhatIsMethIs.config.exception.medicine.NotFoundMedicineIdException;
 import com.WhatIsMethIs.config.exception.user.NotFoundUserIdException;
 import com.WhatIsMethIs.src.dto.medication.MedicationReqDto.*;
 import com.WhatIsMethIs.src.dto.medication.MedicationResDto.*;
@@ -112,7 +113,7 @@ public class MedicationService {
             throw new NotMyMedicationException();
         }
 
-        Medicine newMedicine = medicineRepository.findById(medicationInfo.getMedicineId()).orElseThrow();
+        Medicine newMedicine = medicineRepository.findById(medicationInfo.getMedicineId()).orElseThrow(NotFoundMedicineIdException::new);
         medication.updateMedication(medicationInfo, newMedicine);
         return new MedicationIdRes(medication.getId());
     }
