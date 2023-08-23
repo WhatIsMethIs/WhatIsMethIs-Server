@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/app/medications")
 @RestController
-@Tag(name = "Medication", description = "복약정보 API")
+@Tag(name = "MEDICATION", description = "복약정보 API")
 public class MedicationController {
     private final MedicationService medicationService;
 
@@ -34,7 +34,7 @@ public class MedicationController {
      * 3.1.2 오늘의 복약정보 조회
      * [GET] /medications/today
      */
-    @Operation(description = "오늘의 복약정보를 조회하는 api로, (약물명, 약물이미지, 복용시간, 1회 복용량)을 반환합니다. ",
+    @Operation(description = "오늘의 복약정보를 조회하는 api로, (복약정보 index, 약물명, 약물이미지, 복용시간, 1회 복용량)을 반환합니다. ",
            summary = "3.1.2 오늘의 복약정보 조회")
     @GetMapping("/today")
     public BaseResponse<List<MedicationShortInfoRes>> getTodayMedication() throws BaseException {
@@ -45,7 +45,7 @@ public class MedicationController {
      * 3.1.3 복약정보 전체 조회
      * [GET] /medications/all/:page
      */
-    @Operation(description = "복약정보 전체를 조회하는 api로, MedicationShortInfoRes DTO(약물명, 약물이미지, 복용시간, 1회 복용량)와 전체 페이지 수를 반환합니다. " +
+    @Operation(description = "복약정보 전체를 조회하는 api로, (복약정보 index, 약물명, 약물이미지, 복용시간, 1회 복용량)와 전체 페이지 수를 반환합니다. " +
             "(단, page 변수는 0부터 시작)",
             summary = "3.1.3 복약정보 전체 조회")
     @GetMapping("/all/{page}")
