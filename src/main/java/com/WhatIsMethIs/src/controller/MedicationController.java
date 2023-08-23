@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RequestMapping("/app/medications")
 @RestController
@@ -49,5 +51,28 @@ public class MedicationController {
     @PostMapping("")
     public BaseResponse<MedicationIdRes> createMedication(@RequestBody MedicationInfoReq medicationInfo) throws BaseException {
         return new BaseResponse<>(medicationService.createMedication(medicationInfo));
+    }
+
+    /**
+     * 3.3.1 index로 복약정보 수정
+     * [PATCH] /medications/:index
+     */
+    @Operation(description = "index로 복약정보를 수정하는 api로, 수정된 복약정보 index를 반환합니다. ",
+            summary = "3.3.1 복약정보 수정")
+    @PatchMapping("/{index}")
+    public BaseResponse<MedicationIdRes> updateMedication(@PathVariable("index") Long index, @RequestBody MedicationInfoReq medicationInfo) throws BaseException {
+        return new BaseResponse<>(medicationService.updateMedication(index, medicationInfo));
+    }
+
+    /**
+     * 3.4.1 index 리스트로 복약정보 삭제
+     * [DELETE] /medications
+     */
+    @Operation(description = "삭제할 복약정보 index들이 담긴 List로 복약정보를 삭제합니다. ",
+            summary = "3.4.1 복약정보 삭제")
+    @DeleteMapping("")
+    public BaseResponse<String> deleteMedication(@RequestParam List<Long> medicationIdList) throws BaseException {
+        medicationService.deleteMedication(medicationIdList);
+        return new BaseResponse<>("복약정보들이 성공적으로 삭제되었습니다.");
     }
 }

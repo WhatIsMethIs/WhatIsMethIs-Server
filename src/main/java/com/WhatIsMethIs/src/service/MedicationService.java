@@ -97,6 +97,41 @@ public class MedicationService {
         return new MedicationShortInfoListRes(medicationShortInfos, medications.getTotalPages());
     }
 
+    //index로 복약 정보 수정
+    public MedicationIdRes updateMedication(Long index, MedicationInfoReq medicationInfo) throws BaseException {
+        int userId= tokenUtils.getUserId();
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserIdException::new);
+
+        Medication medication = medicationRepository.findById(index).orElseThrow(NotFoundMedicationIdException::new);
+
+        if(!medication.getUserId().equals(user)){
+            throw new NotMyMedicationException();
+        }
+
+        Medicine newMedicine = medicineRepository.findById(medicationInfo.getMedicineId()).orElseThrow();
+        medication.updateMedication(medicationInfo, newMedicine);
+        return new MedicationIdRes(medication.getId());
+    }
+
+
+    //index 리스트로 복약 정보 삭제
+    public void deleteMedication(List<Long> medicationIdList) throws BaseException {
+        int userId= tokenUtils.getUserId();
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserIdException::new);
+
+        medicationIdList.forEach(id->{
+            Medication medication = medicationRepository.findById(id).orElseThrow(NotFoundMedicationIdException::new);
+
+            if(!medication.getUserId().equals(user)){
+                throw new NotMyMedicationException();
+            }
+
+            medicationRepository.delete(medication);
+        });
+
+
+    }
+
 
 
 }
