@@ -31,6 +31,17 @@ public class MedicationController {
     }
 
     /**
+     * 3.1.2 오늘의 복약정보 조회
+     * [GET] /medications/today
+     */
+    @Operation(description = "오늘의 복약정보를 조회하는 api로, (약물명, 약물이미지, 복용시간, 1회 복용량)을 반환합니다. ",
+           summary = "3.1.2 오늘의 복약정보 조회")
+    @GetMapping("/today")
+    public BaseResponse<List<MedicationShortInfoRes>> getTodayMedication() throws BaseException {
+        return new BaseResponse<>(medicationService.getTodayMedication());
+    }
+
+    /**
      * 3.1.3 복약정보 전체 조회
      * [GET] /medications/all/:page
      */
@@ -39,7 +50,7 @@ public class MedicationController {
             summary = "3.1.3 복약정보 전체 조회")
     @GetMapping("/all/{page}")
     public BaseResponse<MedicationShortInfoListRes> getAllMedication(@PathVariable("page") int page) throws BaseException {
-        return new BaseResponse<>(medicationService.getMedicationShortInfoList(page));
+        return new BaseResponse<>(medicationService.getAllMedication(page));
     }
 
     /**
