@@ -35,7 +35,7 @@ public class FileHandler {
         String absolutePath = new File("").getAbsolutePath() + "\\";
 
         // 경로를 지정하고 이미지 저장
-        String path = "images/" + current_date;
+        String path = "images\\" + current_date;
         File file = new File(path);
         // 저장할 위치의 디렉토리가 존지하지 않을 경우
         if(!file.exists()){
@@ -75,19 +75,19 @@ public class FileHandler {
                 // 생성 후 리스트에 추가
                 PillImageDto pillImageDto = new PillImageDto();
                 pillImageDto.setOriginalFileName(multipartFile.getOriginalFilename());
-                pillImageDto.setStoredFilePath(path + "/" + new_file_name);
+                pillImageDto.setStoredFilePath(path + "\\" + new_file_name);
                 pillImageDto.setFileSize(multipartFile.getSize());
                 fileList.add(pillImageDto);
 
                 // 저장된 파일로 변경하여 이를 보여주기 위함
-                file = new File(absolutePath + path + "/" + new_file_name);
+                file = new File(absolutePath + path + "\\" + new_file_name);
+                System.out.println(absolutePath + path + "\\" + new_file_name);
                 try{
                     multipartFile.transferTo(file);
                 }
                 catch (Exception e){
                     throw new BaseException(BaseResponseStatus.FILEHANDLER_FUNC_TRANFER_TO_EXCEPTION);
                 }
-                System.out.println(absolutePath + path + "/" + new_file_name);
             }
         }
         System.out.println("debug at FileHandler");
