@@ -32,10 +32,10 @@ public class FileHandler {
         String current_date = simpleDateFormat.format(new Date());
 
         // 프로젝트 폴더에 저장하기 위해 절대경로를 설정 (Window 의 Tomcat 은 Temp 파일을 이용)
-        String absolutePath = new File("").getAbsolutePath() + "\\";
+        String absolutePath = new File("").getAbsolutePath() + "/";
 
         // 경로를 지정하고 이미지 저장
-        String path = "images\\" + current_date;
+        String path = "images/" + current_date;
         File file = new File(path);
         // 저장할 위치의 디렉토리가 존지하지 않을 경우
         if(!file.exists()){
@@ -44,7 +44,6 @@ public class FileHandler {
         }
 
         // 파일 처리
-        System.out.println("size of multipartFiles" + multipartFiles.size());
         for (MultipartFile multipartFile : multipartFiles){
             // 파일이 비어 있지 않을 때 작업을 시작
             if(!multipartFile.isEmpty()){
@@ -75,13 +74,13 @@ public class FileHandler {
                 // 생성 후 리스트에 추가
                 PillImageDto pillImageDto = new PillImageDto();
                 pillImageDto.setOriginalFileName(multipartFile.getOriginalFilename());
-                pillImageDto.setStoredFilePath(path + "\\" + new_file_name);
+                pillImageDto.setStoredFilePath(path + "/" + new_file_name);
                 pillImageDto.setFileSize(multipartFile.getSize());
                 fileList.add(pillImageDto);
 
                 // 저장된 파일로 변경하여 이를 보여주기 위함
-                file = new File(absolutePath + path + "\\" + new_file_name);
-                System.out.println(absolutePath + path + "\\" + new_file_name);
+                file = new File(absolutePath + path + "/" + new_file_name);
+                System.out.println(absolutePath + path + "/" + new_file_name);
                 try{
                     multipartFile.transferTo(file);
                 }
