@@ -77,6 +77,7 @@ public class MedicineController {
         try{
             // TODO 모델 서버에 식별 요청
             // 현재는 이미지와 관계 없이 임의의 약물 정보 송신
+            medicineResponseDto = medicineService.getMedicineByImage(images);
             medicineResponseDto = medicineService.getMedicinesByItemSeq("202001927");
 
             // 이미지 로컬 디렉토리에 저장

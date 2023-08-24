@@ -18,7 +18,7 @@ import java.util.List;
 public class FileHandler {
     public List<PillImageDto> parseImageInfo(
             List<MultipartFile> multipartFiles
-    ) throws IOException, BaseException {
+    ) throws BaseException {
         // 반환을 할 파일 리스트
         List<PillImageDto> fileList = new ArrayList<>();
 

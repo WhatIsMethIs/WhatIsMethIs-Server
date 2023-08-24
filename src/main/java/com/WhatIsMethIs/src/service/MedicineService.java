@@ -1,6 +1,7 @@
 package com.WhatIsMethIs.src.service;
 
 import com.WhatIsMethIs.config.BaseException;
+import com.WhatIsMethIs.config.BaseResponseStatus;
 import com.WhatIsMethIs.src.dto.medicine.MedicineDto;
 import com.WhatIsMethIs.src.dto.medicine.MedicineResponseDto;
 import com.WhatIsMethIs.src.entity.Medicine;
@@ -8,12 +9,22 @@ import com.WhatIsMethIs.src.repository.MedicineRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.*;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +41,9 @@ public class MedicineService {
     private final String openApiserviceKey = "jn2o5j7ULjTWI9MuM0HbTPpUUOaIATwvwylC36Oed1AHs5mqh0rSDynNyuDROqOsn4ZcyZ9LUUMgixImyDNkhQ%3D%3D";
     private final int numOfRows = 10;
     private final String openApiResponseType = "json";
+    private final String modelServerUrl = "http://ec2-3-37-100-106.ap-northeast-2.compute.amazonaws.com:5000/medicines/identify";
+    private final String boundary="--------------------------";
+    private final String crlf = "\r\n";
 
     public MedicineResponseDto getMedicinesFromOpenApi(int pageNo) throws IOException, BaseException {
         String apiUrl = openApiEndPoint + "?" +
@@ -334,6 +348,42 @@ public class MedicineService {
         } catch (Exception e){
             e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
+        }
+
+        return medicineResponseDto;
+    }
+
+    public MedicineResponseDto getMedicineByImage(List<MultipartFile> multipartFiles)
+            throws BaseException{
+
+        MedicineResponseDto medicineResponseDto = new MedicineResponseDto();
+
+        try{
+            URL url = new URL(modelServerUrl);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("POST");
+
+            urlConnection.setRequestProperty("Connection", "keep-alive");
+            urlConnection.setRequestProperty("Cache-Control", " no-cache");
+            urlConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + this.boundary);
+
+            OutputStream urlConnectionOutputStream = urlConnection.getOutputStream();
+            DataOutputStream request = new DataOutputStream(urlConnectionOutputStream);
+
+            BufferedReader bufferdReader = new BufferedReader((new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8)));
+            StringBuilder stringBuilder = new StringBuilder();
+            String inputLIne;
+
+            while((inputLIne = bufferdReader.readLine()) != null){
+                stringBuilder.append(inputLIne);
+            }
+            bufferdReader.close();
+
+            String response = stringBuilder.toString();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            throw new BaseException(INVALID_URL);
         }
 
         return medicineResponseDto;

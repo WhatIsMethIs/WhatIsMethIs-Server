@@ -50,6 +50,9 @@ dependencies {
 
 	// JSON
 	implementation 'org.json:json:20200518'
+
+	// WebClient
+	implementation('org.springframework.boot:spring-boot-starter-webflux')
 }
 
 tasks.named('test') {

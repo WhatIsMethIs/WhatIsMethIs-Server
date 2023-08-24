@@ -27,6 +27,7 @@ public enum BaseResponseStatus {
 
     FILE_NOT_FOUND_EXCEPTION(false, 2014, "파일이 없습니다."),
     FILEHANDLER_FUNC_TRANFER_TO_EXCEPTION(false, 2015, "class FileHandler에서 transferTo 실행 중 IOException 발생"),
+    INVALID_URL(false, 2016, "잘못된 URL 요청입니다."),
 
     /**
      * 3000 : Response 오류
