@@ -15,7 +15,6 @@ jobs:
     env:
       working-directory: ./
       APPLICATION: ${{ secrets.APPLICATION_YML }}
-      SECRET: ${{ secrets.SECRET_JAVA }}
 
     steps:
     - name: Checkout code
@@ -37,10 +36,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: Create Secret.java
-      run: |
-        mkdir -p ./src/main/java/com/WhatIsMethIs/config/secret
-        echo "${{env.SECRET}}" > ./src/main/java/com/WhatIsMethIs/config/secret/Secret.java
 
     - name: Create application.yml
       run: |
