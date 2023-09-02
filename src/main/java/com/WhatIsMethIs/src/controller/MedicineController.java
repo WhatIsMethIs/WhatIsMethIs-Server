@@ -80,7 +80,7 @@ public class MedicineController {
             medicineResponseDto = medicineService.getMedicinesByItemSeq("202001927");
 
             // 이미지 로컬 디렉토리에 저장
-            pillImageService.addPillImage(images);
+            //pillImageService.addPillImage(images);
         }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
