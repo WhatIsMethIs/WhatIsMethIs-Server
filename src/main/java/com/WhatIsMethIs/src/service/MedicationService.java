@@ -116,6 +116,7 @@ public class MedicationService {
         Medicine newMedicine = medicineRepository.findByItemSeq(medicationInfo.getMedicineId()).orElseThrow(NotFoundMedicineIdException::new);
         medication.updateMedication(medicationInfo, newMedicine);
         return new MedicationIdRes(medication.getId());
+
     }
 
 
