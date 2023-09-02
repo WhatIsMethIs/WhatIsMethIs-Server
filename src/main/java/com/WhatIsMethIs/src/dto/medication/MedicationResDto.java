@@ -16,6 +16,7 @@ public class MedicationResDto {
 
     @Getter
     public static class MedicationInfoRes{
+        private String medicineId;
         private String medicineName;
         private String medicineImage;
         private int takeCapacity;
@@ -29,9 +30,10 @@ public class MedicationResDto {
 
         @Builder
         public MedicationInfoRes(Medication medication){
+            this.medicineId = medication.getMedicineId().getItemSeq();
             this.medicineName = medication.getMedicineName();
             this.medicineImage = medication.getMedicineImage();
-            this.takeCapacity = medication.getTakeCapacity();;
+            this.takeCapacity = medication.getTakeCapacity();
             this.takeStartDate = medication.getTakeStartDate();
             this.takeEndDate = medication.getTakeEndDate();
             this.takeMealTime = medication.getTakeMealTime();
