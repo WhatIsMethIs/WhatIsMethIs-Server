@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface MedicineRepository extends JpaRepository<Medicine, String> {
     List<Medicine> findAll();
 
-    Optional<Medicine> findById(String id);
+    Optional<Medicine> findByItemSeq(String itemSeq);
 }
