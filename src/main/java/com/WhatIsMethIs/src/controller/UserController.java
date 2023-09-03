@@ -80,6 +80,29 @@ public class UserController {
 
 
     /**
+     * 1.1.3 전화번호로 유저 1명 조회
+     * [GET] /users/phoneNumber?value={value}
+     */
+    @Operation(method = "GET",
+            description = "전화번호로 유저 1명을 조회하는 api로, USER 객체 그대로 반환합니다. 단, 해당하는 유저가 없을 경우 에러 반환(code=3005) " +
+                    "* nullable : password, emerge~, refreshToken, deviceToken", tags = "USER", summary = "1.1.3 전화번호로 유저 1명 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청에 성공하였습니다."),
+            @ApiResponse(responseCode = "3005", description = "유저가 존재하지 않습니다.", content = @Content()),
+            @ApiResponse(responseCode = "4000", description = "데이터베이스 연결에 실패하였습니다.", content = @Content())
+    })
+    @ResponseBody
+    @GetMapping("/phoneNumber")
+    public BaseResponse<User> getUserByPhoneNumber(@Parameter(required = true, name="value", example = "000-0000-0000") @RequestParam String value) {
+        try {
+            User user = userService.getUserByPhoneNumber(value);
+            return new BaseResponse<>(user);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
      * 1.2.1 회원가입
      * [POST] /users
      */

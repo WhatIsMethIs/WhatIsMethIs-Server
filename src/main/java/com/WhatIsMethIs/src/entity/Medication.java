@@ -1,5 +1,6 @@
 package com.WhatIsMethIs.src.entity;
 
+import com.WhatIsMethIs.src.dto.medication.MedicationReqDto.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
@@ -78,5 +79,19 @@ public class Medication {
         this.takeCycle = takeCycle;
         this.notificationTime = notificationTime;
         this.description = description;
+    }
+
+    public void updateMedication(MedicationInfoReq medicationInfo, Medicine newMedicine){
+        this.medicineId = newMedicine;
+        this.medicineName = medicationInfo.getMedicineName();
+        this.medicineImage = medicationInfo.getMedicineImage();
+        this.takeCapacity = medicationInfo.getTakeCapacity();
+        this.takeStartDate = medicationInfo.getTakeStartDate();
+        this.takeEndDate = medicationInfo.getTakeEndDate();
+        this.takeMealTime = medicationInfo.getTakeMealTime();
+        this.takeBeforeAfter = medicationInfo.getTakeBeforeAfter();
+        this.takeCycle = medicationInfo.getTakeCycle();
+        this.notificationTime = medicationInfo.getNotificationTime();
+        this.description = medicationInfo.getDescription();
     }
 }
