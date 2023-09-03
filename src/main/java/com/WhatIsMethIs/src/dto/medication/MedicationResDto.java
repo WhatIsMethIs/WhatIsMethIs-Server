@@ -55,6 +55,7 @@ public class MedicationResDto {
     @AllArgsConstructor
     public static class MedicationShortInfoRes{
         private Long medicationId;
+        private String medicineId;
         private String medicineName;
         private String medicineImage;
         private MedicationConstant.TakeMealTime takeMealTime; //아침, 점심, 저녁

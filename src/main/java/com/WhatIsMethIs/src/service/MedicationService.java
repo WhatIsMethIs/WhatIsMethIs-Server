@@ -94,7 +94,7 @@ public class MedicationService {
         log.warn(LOG_FORMAT, medications.stream().count());
 
         List<MedicationShortInfoRes> medicationShortInfos = medications.stream()
-                .map(medication -> new MedicationShortInfoRes(medication.getId(), medication.getMedicineName(),
+                .map(medication -> new MedicationShortInfoRes(medication.getId(), medication.getMedicineId().getItemSeq(), medication.getMedicineName(),
                         medication.getMedicineImage(), medication.getTakeMealTime(), medication.getTakeBeforeAfter(),
                         medication.getTakeCapacity()))
                 .collect(Collectors.toList());
@@ -152,7 +152,7 @@ public class MedicationService {
             LocalDate endDate = medication.getTakeEndDate();
 
             if (startDate.isEqual(today)){
-                medicationsToday.add(new MedicationShortInfoRes(medication.getId(), medication.getMedicineName(), medication.getMedicineImage(), medication.getTakeMealTime(), medication.getTakeBeforeAfter(), medication.getTakeCapacity()));
+                medicationsToday.add(new MedicationShortInfoRes(medication.getId(), medication.getMedicineId().getItemSeq(), medication.getMedicineName(), medication.getMedicineImage(), medication.getTakeMealTime(), medication.getTakeBeforeAfter(), medication.getTakeCapacity()));
             } else if (startDate.isBefore(today) && endDate.isAfter(today)){
                 int cycle = medication.getTakeCycle();
                 LocalDate takeDate = startDate;
@@ -162,7 +162,7 @@ public class MedicationService {
                     takeDate = takeDate.plusDays(cycle);
                 }
                 if(takeDate.isEqual(today)){
-                    medicationsToday.add(new MedicationShortInfoRes(medication.getId(), medication.getMedicineName(), medication.getMedicineImage(), medication.getTakeMealTime(), medication.getTakeBeforeAfter(), medication.getTakeCapacity()));
+                    medicationsToday.add(new MedicationShortInfoRes(medication.getId(), medication.getMedicineId().getItemSeq(), medication.getMedicineName(), medication.getMedicineImage(), medication.getTakeMealTime(), medication.getTakeBeforeAfter(), medication.getTakeCapacity()));
                 }
             }
         });
