@@ -26,16 +26,24 @@ public class MedicineService {
 
     private final MedicineRepository medicineRepository;
 
-    private final String openApiEndPoint = "http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList";
-    private final String openApiserviceKey = "jn2o5j7ULjTWI9MuM0HbTPpUUOaIATwvwylC36Oed1AHs5mqh0rSDynNyuDROqOsn4ZcyZ9LUUMgixImyDNkhQ%3D%3D";
+    // api 공통
     private final int numOfRows = 10;
     private final String openApiResponseType = "json";
+    private final String openApiserviceKey = "jn2o5j7ULjTWI9MuM0HbTPpUUOaIATwvwylC36Oed1AHs5mqh0rSDynNyuDROqOsn4ZcyZ9LUUMgixImyDNkhQ%3D%3D";
+
+    // 식품의약품안전처_의약품개요정보(e약은요)
+    private final String openApiEndPoint_easyDrugInfo = "http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList";
+    
+    // 식품의약품안전처_의약품 낱알식별 정보
+    private final String openApiEndPoint_minimumInfo = "https://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01";
+    
+    // 모델 서버
     private final String modelServerUrl = "http://ec2-3-37-100-106.ap-northeast-2.compute.amazonaws.com:5000/medicines/identify";
     private final String boundary="--------------------------";
     private final String crlf = "\r\n";
 
     public MedicineResponseDto getMedicinesFromOpenApi(int pageNo) throws IOException, BaseException {
-        String apiUrl = openApiEndPoint + "?" +
+        String apiUrl = openApiEndPoint_easyDrugInfo + "?" +
                 "serviceKey=" + openApiserviceKey +
                 "&pageNo=" + pageNo +
                 "&numOfRows=" + numOfRows +
@@ -125,7 +133,7 @@ public class MedicineService {
     }
 
     public MedicineResponseDto getMedicinesFromOpenApiByItemName(String itemName, int pageNo) throws IOException, BaseException {
-        String apiUrl = openApiEndPoint + "?" +
+        String apiUrl = openApiEndPoint_easyDrugInfo + "?" +
                 "serviceKey=" + openApiserviceKey +
                 "&pageNo=" + pageNo +
                 "&numOfRows=" + numOfRows +
@@ -220,7 +228,7 @@ public class MedicineService {
     }
 
     public MedicineResponseDto getMedicinesFromOpenApiByItemSeq(String itemSeq) throws IOException, BaseException {
-        String apiUrl = openApiEndPoint + "?" +
+        String apiUrl = openApiEndPoint_easyDrugInfo + "?" +
                 "serviceKey=" + openApiserviceKey +
                 "&itemSeq=" + itemSeq +
                 "&numOfRows=" + numOfRows +
@@ -248,62 +256,136 @@ public class MedicineService {
 
         MedicineResponseDto medicineResponseDto = new MedicineResponseDto();
 
-        medicineResponseDto.setPageNo(jsonObjectBody.getInt("pageNo"));
-        medicineResponseDto.setTotalCount(jsonObjectBody.getInt("totalCount"));
-        medicineResponseDto.setNumOfRows(jsonObjectBody.getInt("numOfRows"));
+        int totalCountOfResponse = jsonObjectBody.getInt("totalCount");
 
-        JSONArray jsonItems = jsonObjectBody.getJSONArray("items");
-        for(Object item : jsonItems){
-            JSONObject jsonItem = (JSONObject) item;
+        if(totalCountOfResponse > 0) {
+            medicineResponseDto.setPageNo(jsonObjectBody.getInt("pageNo"));
+            medicineResponseDto.setTotalCount(totalCountOfResponse);
+            medicineResponseDto.setNumOfRows(jsonObjectBody.getInt("numOfRows"));
 
-            MedicineDto medicineDto = new MedicineDto();
+            JSONArray jsonItems = jsonObjectBody.getJSONArray("items");
+            for (Object item : jsonItems) {
+                JSONObject jsonItem = (JSONObject) item;
 
-            if(!jsonItem.get("entpName").equals(null)){
-                medicineDto.setEntpName(jsonItem.getString("entpName"));
-            }
-            if(!jsonItem.get("itemName").equals(null)){
-                medicineDto.setItemName(jsonItem.getString("itemName"));
-            }
-            if(!jsonItem.get("itemSeq").equals(null)){
-                medicineDto.setItemSeq(jsonItem.getString("itemSeq"));
-            }
-            if(!jsonItem.get("efcyQesitm").equals(null)){
-                medicineDto.setEfcyQesitm(jsonItem.getString("efcyQesitm"));
-            }
-            if(!jsonItem.get("useMethodQesitm").equals(null)){
-                medicineDto.setUseMethodQesitm(jsonItem.getString("useMethodQesitm"));
-            }
-            if(!jsonItem.get("atpnWarnQesitm").equals(null)){
-                medicineDto.setAtpnWarnQesitm(jsonItem.getString("atpnWarnQesitm"));
-            }
-            if(!jsonItem.get("atpnQesitm").equals(null)){
-                medicineDto.setAtpnQesitm(jsonItem.getString("atpnQesitm"));
-            }
-            if(!jsonItem.get("intrcQesitm").equals(null)){
-                medicineDto.setIntrcQesitm(jsonItem.getString("intrcQesitm"));
-            }
-            if(!jsonItem.get("seQesitm").equals(null)){
-                medicineDto.setSeQesitm(jsonItem.getString("seQesitm"));
-            }
-            if(!jsonItem.get("depositMethodQesitm").equals(null)){
-                medicineDto.setDepositMethodQesitm(jsonItem.getString("depositMethodQesitm"));
-            }
-            if(!jsonItem.get("openDe").equals(null)){
-                medicineDto.setOpenDe(jsonItem.getString("openDe"));
-            }
-            if(!jsonItem.get("updateDe").equals(null)){
-                medicineDto.setUpdateDe(jsonItem.getString("updateDe"));
-            }
-            if(!jsonItem.get("itemImage").equals(null)){
-                medicineDto.setItemImage(jsonItem.getString("itemImage"));
-            }
-            if(!jsonItem.get("bizrno").equals(null)){
-                medicineDto.setBizrno(jsonItem.getString("bizrno"));
-            }
+                MedicineDto medicineDto = new MedicineDto();
 
-            medicineResponseDto.getMedicines().add(medicineDto);
+                if (!jsonItem.get("entpName").equals(null)) {
+                    medicineDto.setEntpName(jsonItem.getString("entpName"));
+                }
+                if (!jsonItem.get("itemName").equals(null)) {
+                    medicineDto.setItemName(jsonItem.getString("itemName"));
+                }
+                if (!jsonItem.get("itemSeq").equals(null)) {
+                    medicineDto.setItemSeq(jsonItem.getString("itemSeq"));
+                }
+                if (!jsonItem.get("efcyQesitm").equals(null)) {
+                    medicineDto.setEfcyQesitm(jsonItem.getString("efcyQesitm"));
+                }
+                if (!jsonItem.get("useMethodQesitm").equals(null)) {
+                    medicineDto.setUseMethodQesitm(jsonItem.getString("useMethodQesitm"));
+                }
+                if (!jsonItem.get("atpnWarnQesitm").equals(null)) {
+                    medicineDto.setAtpnWarnQesitm(jsonItem.getString("atpnWarnQesitm"));
+                }
+                if (!jsonItem.get("atpnQesitm").equals(null)) {
+                    medicineDto.setAtpnQesitm(jsonItem.getString("atpnQesitm"));
+                }
+                if (!jsonItem.get("intrcQesitm").equals(null)) {
+                    medicineDto.setIntrcQesitm(jsonItem.getString("intrcQesitm"));
+                }
+                if (!jsonItem.get("seQesitm").equals(null)) {
+                    medicineDto.setSeQesitm(jsonItem.getString("seQesitm"));
+                }
+                if (!jsonItem.get("depositMethodQesitm").equals(null)) {
+                    medicineDto.setDepositMethodQesitm(jsonItem.getString("depositMethodQesitm"));
+                }
+                if (!jsonItem.get("openDe").equals(null)) {
+                    medicineDto.setOpenDe(jsonItem.getString("openDe"));
+                }
+                if (!jsonItem.get("updateDe").equals(null)) {
+                    medicineDto.setUpdateDe(jsonItem.getString("updateDe"));
+                }
+                if (!jsonItem.get("itemImage").equals(null)) {
+                    medicineDto.setItemImage(jsonItem.getString("itemImage"));
+                }
+                if (!jsonItem.get("bizrno").equals(null)) {
+                    medicineDto.setBizrno(jsonItem.getString("bizrno"));
+                }
 
-            medicineRepository.save(Medicine.toEntity(medicineDto));
+                medicineResponseDto.getMedicines().add(medicineDto);
+
+                medicineRepository.save(Medicine.toEntity(medicineDto));
+            }
+        }
+        else{
+            apiUrl = openApiEndPoint_minimumInfo + "?" +
+                    "serviceKey=" + openApiserviceKey +
+                    "&item_seq=" + itemSeq +
+                    "&numOfRows=" + numOfRows +
+                    "&type=" + openApiResponseType +
+                    "&pageNo=1";
+
+            url = new URL(apiUrl);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+
+            bufferdReader = new BufferedReader((new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8)));
+            stringBuilder = new StringBuilder();
+            inputLIne = "";
+
+            while((inputLIne = bufferdReader.readLine()) != null){
+                stringBuilder.append(inputLIne);
+            }
+            bufferdReader.close();
+
+            response = stringBuilder.toString();
+            System.out.println(response);
+
+            if(response.startsWith("<")){
+                throw new BaseException(RESPONSE_IS_XML);
+            }
+            jsonObjectBody = new JSONObject(response).getJSONObject("body");
+            medicineResponseDto.setPageNo(jsonObjectBody.getInt("pageNo"));
+            medicineResponseDto.setTotalCount(jsonObjectBody.getInt("totalCount"));
+            medicineResponseDto.setNumOfRows(jsonObjectBody.getInt("numOfRows"));
+
+            JSONArray jsonItems = jsonObjectBody.getJSONArray("items");
+            for (Object item : jsonItems) {
+                JSONObject jsonItem = (JSONObject) item;
+
+                MedicineDto medicineDto = new MedicineDto();
+
+                if (!jsonItem.get("ENTP_NAME").equals(null)) {
+                    medicineDto.setEntpName(jsonItem.getString("ENTP_NAME"));
+                }
+                if (!jsonItem.get("ITEM_NAME").equals(null)) {
+                    medicineDto.setItemName(jsonItem.getString("ITEM_NAME"));
+                }
+                if (!jsonItem.get("IMG_REGIST_TS").equals(null)) {
+                    medicineDto.setOpenDe(jsonItem.getString("IMG_REGIST_TS"));
+                }
+                if (!jsonItem.get("CHANGE_DATE").equals(null)) {
+                    medicineDto.setUpdateDe(jsonItem.getString("CHANGE_DATE"));
+                }
+                if (!jsonItem.get("ITEM_IMAGE").equals(null)) {
+                    medicineDto.setItemImage(jsonItem.getString("ITEM_IMAGE"));
+                }
+                if (!jsonItem.get("EDI_CODE").equals(null)) {
+                    medicineDto.setBizrno(jsonItem.getString("EDI_CODE"));
+                }
+                medicineDto.setItemSeq("정보 없음.");
+                medicineDto.setEfcyQesitm("정보 없음.");
+                medicineDto.setUseMethodQesitm("정보 없음.");
+                medicineDto.setAtpnWarnQesitm("정보 없음.");
+                medicineDto.setAtpnQesitm("정보 없음.");
+                medicineDto.setIntrcQesitm("정보 없음.");
+                medicineDto.setSeQesitm("정보 없음.");
+                medicineDto.setDepositMethodQesitm("정보 없음.");
+
+                medicineResponseDto.getMedicines().add(medicineDto);
+
+                medicineRepository.save(Medicine.toEntity(medicineDto));
+            }
         }
 
         return medicineResponseDto;

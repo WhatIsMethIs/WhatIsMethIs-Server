@@ -82,6 +82,7 @@ public class MedicineController {
             try {
                 medicineResponseDto = medicineService.getMedicinesByItemSeq(SeqNoMapper.getSeqNoByRegNo(regNoFromModel));
             } catch (IOException e) {
+                e.printStackTrace();
                 throw new BaseException(INVALID_REG_NO);
             }
 
