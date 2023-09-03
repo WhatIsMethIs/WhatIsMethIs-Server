@@ -93,7 +93,7 @@ public class UserController {
     })
     @ResponseBody
     @GetMapping("/phoneNumber")
-    public BaseResponse<User> getUserByPhoneNumber(@Parameter(required = true, name="phoneNumber", example = "000-0000-0000") @RequestParam String phoneNumber) {
+    public BaseResponse<User> getUserByPhoneNumber(@Parameter(required = true, name="value", example = "000-0000-0000") @RequestParam String phoneNumber) {
         try {
             User user = userService.getUserByPhoneNumber(phoneNumber);
             return new BaseResponse<>(user);
