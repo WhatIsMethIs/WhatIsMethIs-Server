@@ -5,6 +5,7 @@ import com.WhatIsMethIs.config.BaseResponse;
 import com.WhatIsMethIs.src.dto.medicine.MedicineResponseDto;
 import com.WhatIsMethIs.src.service.MedicineService;
 import com.WhatIsMethIs.src.service.PillImageService;
+import com.WhatIsMethIs.utils.SeqNoMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.WhatIsMethIs.config.BaseResponseStatus.INVALID_REG_NO;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/medicines")
@@ -23,6 +26,8 @@ import java.util.List;
 public class MedicineController {
     private final MedicineService medicineService;
     private final PillImageService pillImageService;
+
+    private final SeqNoMapper SeqNoMapper;
 
     /**
      * 2.1.1 약물 정보 전체 조회
@@ -73,8 +78,12 @@ public class MedicineController {
         try{
             // TODO 모델 서버에 식별 요청
             // 현재는 이미지와 관계 없이 임의의 약물 정보 송신
-            String classIdFromModel = medicineService.getMedicineByImage(images);
-            medicineResponseDto = medicineService.getMedicinesByItemSeq("202001927");
+            String regNoFromModel = medicineService.getMedicineByImage(images);
+            try {
+                medicineResponseDto = medicineService.getMedicinesByItemSeq(SeqNoMapper.getSeqNoByRegNo(regNoFromModel));
+            } catch (IOException e) {
+                throw new BaseException(INVALID_REG_NO);
+            }
 
             // 이미지 로컬 디렉토리에 저장
             //pillImageService.addPillImage(images);

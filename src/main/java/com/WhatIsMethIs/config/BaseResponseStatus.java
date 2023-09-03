@@ -43,6 +43,8 @@ public enum BaseResponseStatus {
     LOGIN_TO_EMAIL(false, 3006, "이메일 가입 사용자입니다."),
     WRONG_PASSWORD(false,3007,"비밀번호가 틀렸습니다."),
 
+    INVALID_REG_NO(false, 3008, "regNo_seqNo.json에 존재하지 않는 접수번호입니다."),
+
 
 
     /**
