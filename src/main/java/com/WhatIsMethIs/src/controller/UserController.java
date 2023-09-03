@@ -81,7 +81,7 @@ public class UserController {
 
     /**
      * 1.1.3 전화번호로 유저 1명 조회
-     * [GET] /users/phoneNumber?value={phoneNumber}
+     * [GET] /users/phoneNumber?value={value}
      */
     @Operation(method = "GET",
             description = "전화번호로 유저 1명을 조회하는 api로, USER 객체 그대로 반환합니다. 단, 해당하는 유저가 없을 경우 에러 반환(code=3005) " +
@@ -93,9 +93,9 @@ public class UserController {
     })
     @ResponseBody
     @GetMapping("/phoneNumber")
-    public BaseResponse<User> getUserByPhoneNumber(@Parameter(required = true, name="value", example = "000-0000-0000") @RequestParam String phoneNumber) {
+    public BaseResponse<User> getUserByPhoneNumber(@Parameter(required = true, name="value", example = "000-0000-0000") @RequestParam String value) {
         try {
-            User user = userService.getUserByPhoneNumber(phoneNumber);
+            User user = userService.getUserByPhoneNumber(value);
             return new BaseResponse<>(user);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
