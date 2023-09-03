@@ -63,7 +63,7 @@ public class MedicationService {
         int userId= tokenUtils.getUserId();
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserIdException::new);
 
-        Medicine medicine = medicineRepository.findById(medicationInfo.getMedicineId()).orElseThrow(NotFoundMedicineIdException::new);
+        Medicine medicine = medicineRepository.findByItemSeq(medicationInfo.getMedicineId()).orElseThrow(NotFoundMedicineIdException::new);
 
         Medication medication = Medication.builder()
                 .userId(user)
