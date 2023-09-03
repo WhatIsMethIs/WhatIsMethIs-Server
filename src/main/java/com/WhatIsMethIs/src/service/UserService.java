@@ -43,13 +43,16 @@ public class UserService {
     // index로 User 1명 조회
     public User getUser(int index) throws BaseException{
         User user = userRepository.findById(index).orElse(null);
-        try {
-            if(user == null) throw new BaseException(USER_NOT_EXIST);
-            return user;
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            throw new BaseException(DATABASE_ERROR);
-        }
+        if(user == null) throw new BaseException(USER_NOT_EXIST);
+        return user;
+    }
+
+    // 전화번호로 User 1명 조회
+    public User getUserByPhoneNumber(String phoneNumber) throws BaseException{
+        User user = userRepository.findByPhoneNumber(phoneNumber).orElse(null);
+        if(user == null) throw new BaseException(USER_NOT_EXIST);
+        return user;
+
     }
 
     // 회원가입
