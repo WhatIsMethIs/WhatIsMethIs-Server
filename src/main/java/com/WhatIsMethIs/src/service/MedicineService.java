@@ -1,7 +1,6 @@
 package com.WhatIsMethIs.src.service;
 
 import com.WhatIsMethIs.config.BaseException;
-import com.WhatIsMethIs.config.BaseResponseStatus;
 import com.WhatIsMethIs.src.dto.medicine.MedicineDto;
 import com.WhatIsMethIs.src.dto.medicine.MedicineResponseDto;
 import com.WhatIsMethIs.src.entity.Medicine;
@@ -9,22 +8,11 @@ import com.WhatIsMethIs.src.repository.MedicineRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.http.*;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +23,7 @@ import static com.WhatIsMethIs.config.BaseResponseStatus.*;
 @Service
 @RequiredArgsConstructor
 public class MedicineService {
+
     private final MedicineRepository medicineRepository;
 
     private final String openApiEndPoint = "http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList";
@@ -67,7 +56,7 @@ public class MedicineService {
         String response = stringBuilder.toString();
 
         if(response.startsWith("<")){
-            throw new BaseException(OPEN_API_ERROR);
+            throw new BaseException(RESPONSE_IS_XML);
         }
 
         JSONObject jsonObjectBody = new JSONObject(response).getJSONObject("body");
@@ -158,7 +147,7 @@ public class MedicineService {
         String response = stringBuilder.toString();
 
         if(response.startsWith("<")){
-            throw new BaseException(OPEN_API_ERROR);
+            throw new BaseException(RESPONSE_IS_XML);
         }
 
         MedicineResponseDto medicineResponseDto = null;
@@ -252,7 +241,7 @@ public class MedicineService {
         String response = stringBuilder.toString();
 
         if(response.startsWith("<")){
-            throw new BaseException(OPEN_API_ERROR);
+            throw new BaseException(RESPONSE_IS_XML);
         }
 
         JSONObject jsonObjectBody = new JSONObject(response).getJSONObject("body");
@@ -353,24 +342,61 @@ public class MedicineService {
         return medicineResponseDto;
     }
 
-    public MedicineResponseDto getMedicineByImage(List<MultipartFile> multipartFiles)
+    public String getMedicineByImage(List<MultipartFile> multipartFiles)
             throws BaseException{
 
-        MedicineResponseDto medicineResponseDto = new MedicineResponseDto();
+        //MedicineResponseDto medicineResponseDto = new MedicineResponseDto();
+        String rt = "";
 
         try{
             URL url = new URL(modelServerUrl);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
 
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setUseCaches(false);
+
             urlConnection.setRequestProperty("Connection", "keep-alive");
-            urlConnection.setRequestProperty("Cache-Control", " no-cache");
             urlConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + this.boundary);
 
-            OutputStream urlConnectionOutputStream = urlConnection.getOutputStream();
-            DataOutputStream request = new DataOutputStream(urlConnectionOutputStream);
+            OutputStream outputStream = urlConnection.getOutputStream();
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
 
-            BufferedReader bufferdReader = new BufferedReader((new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8)));
+            if (multipartFiles.size() > 1){
+                throw new BaseException(TOO_MANY_FILES);
+            }
+            else{
+                MultipartFile multipartFile = multipartFiles.get(0);
+                writer.append("--" + boundary).append(this.crlf);
+                //System.out.println("--" + boundary + this.crlf);
+                writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + multipartFile.getOriginalFilename() + "\"").append(this.crlf);
+                //System.out.println("Content-Disposition: form-data; name=\"file\"; filename=\"" + multipartFile.getOriginalFilename() + "\"" + this.crlf);
+                writer.append("Content-Type: " + multipartFile.getContentType()).append(this.crlf);
+                //System.out.println("Content-Type: " + multipartFile.getContentType() + this.crlf);
+                writer.append("Content-Transfer-Encoding: binary").append(this.crlf);
+                //System.out.println("Content-Transfer-Encoding: binary" + this.crlf);
+                writer.append(this.crlf);
+                //System.out.println(this.crlf);
+                writer.flush();
+
+                InputStream inputStream = multipartFile.getInputStream();
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while((bytesRead = inputStream.read(buffer)) != -1){
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                outputStream.flush();
+                inputStream.close();
+
+                writer.append(this.crlf).flush();
+            }
+
+            writer.append("--").append(boundary).append("--").append(this.crlf);
+            writer.flush();
+
+            InputStreamReader inputStreamReader = (new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8));
+            BufferedReader bufferdReader = new BufferedReader(inputStreamReader);
             StringBuilder stringBuilder = new StringBuilder();
             String inputLIne;
 
@@ -380,13 +406,20 @@ public class MedicineService {
             bufferdReader.close();
 
             String response = stringBuilder.toString();
+            if(response.startsWith("<")){
+                throw new BaseException(RESPONSE_IS_XML);
+            }
+
+            rt = new JSONObject(response).getString("class_id");
+            System.out.println(rt);
         }
         catch(Exception e){
             e.printStackTrace();
             throw new BaseException(INVALID_URL);
         }
 
-        return medicineResponseDto;
+        //return medicineResponseDto;
+        return rt;
     }
 
 
