@@ -27,6 +27,8 @@ public enum BaseResponseStatus {
 
     FILE_NOT_FOUND_EXCEPTION(false, 2014, "파일이 없습니다."),
     FILEHANDLER_FUNC_TRANFER_TO_EXCEPTION(false, 2015, "class FileHandler에서 transferTo 실행 중 IOException 발생"),
+    INVALID_URL(false, 2016, "잘못된 URL 요청입니다."),
+    TOO_MANY_FILES(false, 2017, "너무 많은 파일이 입력되었습니다."),
 
     /**
      * 3000 : Response 오류
@@ -41,6 +43,8 @@ public enum BaseResponseStatus {
     LOGIN_TO_EMAIL(false, 3006, "이메일 가입 사용자입니다."),
     WRONG_PASSWORD(false,3007,"비밀번호가 틀렸습니다."),
 
+    INVALID_REG_NO(false, 3008, "regNo_seqNo.json에 존재하지 않는 접수번호입니다."),
+
 
 
     /**
@@ -51,9 +55,9 @@ public enum BaseResponseStatus {
     PASSWORD_DECRYPTION_ERROR(false, 4011, "비밀번호 복호화에 실패하였습니다."),
 
     /**
-     * 5000 : OpenApi 오류
+     * 5000 : OpenApi 및 모델 서버 응답 형식 오류
      */
-    OPEN_API_ERROR(false, 5000, "Open Api 연결에 실패하셨습니다.");
+    RESPONSE_IS_XML(false, 5000, "Open Api 연결에 실패하셨습니다.");
 
     private final boolean isSuccess;
     private final int code;

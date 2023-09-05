@@ -18,7 +18,7 @@ import java.util.List;
 public class FileHandler {
     public List<PillImageDto> parseImageInfo(
             List<MultipartFile> multipartFiles
-    ) throws IOException, BaseException {
+    ) throws BaseException {
         // 반환을 할 파일 리스트
         List<PillImageDto> fileList = new ArrayList<>();
 
@@ -32,7 +32,7 @@ public class FileHandler {
         String current_date = simpleDateFormat.format(new Date());
 
         // 프로젝트 폴더에 저장하기 위해 절대경로를 설정 (Window 의 Tomcat 은 Temp 파일을 이용)
-        String absolutePath = new File("").getAbsolutePath() + "\\";
+        String absolutePath = new File("").getAbsolutePath() + "/";
 
         // 경로를 지정하고 이미지 저장
         String path = "images/" + current_date;
@@ -44,7 +44,6 @@ public class FileHandler {
         }
 
         // 파일 처리
-        System.out.println("size of multipartFiles" + multipartFiles.size());
         for (MultipartFile multipartFile : multipartFiles){
             // 파일이 비어 있지 않을 때 작업을 시작
             if(!multipartFile.isEmpty()){
@@ -81,13 +80,13 @@ public class FileHandler {
 
                 // 저장된 파일로 변경하여 이를 보여주기 위함
                 file = new File(absolutePath + path + "/" + new_file_name);
+                System.out.println(absolutePath + path + "/" + new_file_name);
                 try{
                     multipartFile.transferTo(file);
                 }
                 catch (Exception e){
                     throw new BaseException(BaseResponseStatus.FILEHANDLER_FUNC_TRANFER_TO_EXCEPTION);
                 }
-                System.out.println(absolutePath + path + "/" + new_file_name);
             }
         }
         System.out.println("debug at FileHandler");
