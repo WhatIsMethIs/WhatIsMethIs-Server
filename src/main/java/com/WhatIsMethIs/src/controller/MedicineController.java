@@ -78,9 +78,10 @@ public class MedicineController {
         try{
             // TODO 모델 서버에 식별 요청
             // 현재는 이미지와 관계 없이 임의의 약물 정보 송신
-            String regNoFromModel = medicineService.getMedicineByImage(images);
+            //String regNoFromModel = medicineService.getMedicineByImage(images);
             try {
-                medicineResponseDto = medicineService.getMedicinesByItemSeq(SeqNoMapper.getSeqNoByRegNo(regNoFromModel));
+                //medicineResponseDto = medicineService.getMedicinesByItemSeq(SeqNoMapper.getSeqNoByRegNo(regNoFromModel));
+                medicineResponseDto = medicineService.getMedicinesByItemSeq(SeqNoMapper.getSeqNoByRegNo("40720"));
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new BaseException(INVALID_REG_NO);

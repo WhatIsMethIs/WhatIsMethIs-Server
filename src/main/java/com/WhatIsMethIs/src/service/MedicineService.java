@@ -355,6 +355,7 @@ public class MedicineService {
 
                 MedicineDto medicineDto = new MedicineDto();
 
+                medicineDto.setItemSeq(itemSeq);
                 if (!jsonItem.get("ENTP_NAME").equals(null)) {
                     medicineDto.setEntpName(jsonItem.getString("ENTP_NAME"));
                 }
@@ -373,7 +374,6 @@ public class MedicineService {
                 if (!jsonItem.get("EDI_CODE").equals(null)) {
                     medicineDto.setBizrno(jsonItem.getString("EDI_CODE"));
                 }
-                medicineDto.setItemSeq("정보 없음.");
                 medicineDto.setEfcyQesitm("정보 없음.");
                 medicineDto.setUseMethodQesitm("정보 없음.");
                 medicineDto.setAtpnWarnQesitm("정보 없음.");
